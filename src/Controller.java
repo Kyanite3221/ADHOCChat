@@ -1,3 +1,4 @@
+import IPLayer.IPLayer;
 import TCPLayer.TCPLayer;
 import View.View;
 
@@ -8,7 +9,9 @@ public class Controller {
 	public static void main(String[] args) {
 		View view = new View();
 		Thread viewThread = new Thread(view);
+
 		TCPLayer tcpLayer = new TCPLayer();
+		IPLayer ipLayer = new IPLayer();
 
 		while (true) {
 			if (view.hasMessage()) {
@@ -19,8 +22,17 @@ public class Controller {
 
 				byte[] data = encodeToByteArray(plaintext);
 				byte[] tcpData = tcpLayer.createDataMessage(data, receiver);
+				byte[] ipData = ipLayer.addIPHeader(tcpData);
+
+				//TODO: figure out how the fuck to send stuff aaaaahhhhh
+				send(ipData);
 			}
 		}
+	}
+
+	//TODO: figure out how the fuck to send stuff aaaaahhhhh
+	private static void send(byte[] ipData) {
+
 	}
 
 	//TODO: this method needs a better place. we absolutely don't want it as a static method in the controller
