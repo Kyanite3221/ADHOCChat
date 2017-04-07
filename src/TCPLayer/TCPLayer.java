@@ -8,7 +8,7 @@ public class TCPLayer {
     SequenceStrategy SequenceGetter;
     //Richard's class, waaraan ik de data moet geven
 
-    public byte[] createDataMessage (Byte[] data, String reciever){
+    public byte[] createDataMessage (byte[] data, String reciever) {
 
         return TCPMessage;
     }
