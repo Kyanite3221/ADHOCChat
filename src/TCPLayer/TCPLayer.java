@@ -1,24 +1,36 @@
 package TCPLayer;
 
+import java.util.LinkedList;
+
 /**
  * Created by freem on 4/7/2017.
  */
 public class TCPLayer {
 
     SequenceStrategy SequenceGetter;
+    LinkedList<TCPMessage> sendingQueue;
     //Richard's class, waaraan ik de data moet geven
 
+    public TCPLayer(){
+
+    }
     public byte[] createDataMessage (Byte[] data, String reciever){
 
-        return TCPMessage;
+        return null;
     }
 
     public byte[] createPingMessage(){
 
-        return TCPMessage;
+        return null;
     }
 
-    public TCPMessage createTCPMessage() {
+    public void createTCPMessage() {
+
+        return null;
+    }
+
+    public TCPMessage ping(){
 
     }
+
 }
