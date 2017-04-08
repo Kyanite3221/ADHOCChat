@@ -16,6 +16,7 @@ public class StopAndWait implements SequenceStrategy {
     @Override
     public int getNextSeqNumber() {
         if (hasNextAvailible) {
+            hasNextAvailible=false;
             return nextNumber;
         } else {
             return -42;
