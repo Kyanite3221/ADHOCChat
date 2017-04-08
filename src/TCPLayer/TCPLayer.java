@@ -14,7 +14,7 @@ public class TCPLayer {
     public TCPLayer(){
 
     }
-    public byte[] createDataMessage (Byte[] data, String reciever){
+    public byte[] createDataMessage (byte[] data, String reciever){
 
         return null;
     }
