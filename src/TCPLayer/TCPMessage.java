@@ -15,20 +15,22 @@ public class TCPMessage {
     private byte port;
     /**
      * Ports:       meaning
-     * 0            Table Synchronization
-     * 1            Connection Establishment
-     * 2            Message Delivery
-     * 3            (File Delivery)
+     * 00            Table Synchronization
+     * 01            Connection Establishment
+     * 02            Message Delivery
+     * 03            (File Delivery)
+     * 06            Ack only(no message)
      */
     //private int headerLength; not nececairy, because it's always the same.
     private byte flags;
     /**
      * flags:       meaning
-     * 1            SYN
-     * 2            ACK
-     * 3            FIN
-     * 4            RESET
-     * 8            ROUTING DATA
+     * 01            SYN
+     * 02            ACK
+     * 03            SYN/ACK
+     * 04            FIN
+     * 06            FIN/ACK
+     * 08            ROUTING DATA
      */
     private int payloadSize;
     private byte[] payload;
@@ -40,7 +42,11 @@ public class TCPMessage {
         dataHash = hashData;
         port = poort;
         flags = flaggen;
-        payloadSize = data.length;
+        if (data != null){
+            payloadSize = data.length;
+        } else {
+            payloadSize = 0;
+        }
         payload = data;
     }
 
@@ -143,7 +149,9 @@ public class TCPMessage {
         finalArray = Utilities.BytewiseUtilities.arrayInsertion(intByte, finalArray, 22);
         //converting the payloadSize into bytes and then entering that into the final array.
 
-        finalArray = Utilities.BytewiseUtilities.arrayInsertion(payload, finalArray, 26);
+        if (payloadSize > 0){
+            finalArray = Utilities.BytewiseUtilities.arrayInsertion(payload, finalArray, 26);
+        }
 
         return finalArray;
     }

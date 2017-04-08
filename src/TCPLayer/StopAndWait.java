@@ -7,16 +7,22 @@ public class StopAndWait implements SequenceStrategy {
 
     private int nextNumber;
     private boolean hasNextAvailible;
+    private int payloadSize;
 
     public StopAndWait(){
-        nextNumber = 1;
+        nextNumber = 42;
         hasNextAvailible = true;
+        payloadSize = 1;
     }
 
     @Override
-    public int getNextSeqNumber() {
+    public int getNextSeqNumber(int payloadLength) {
         if (hasNextAvailible) {
             hasNextAvailible=false;
+            payloadSize = payloadLength;
+            if (payloadSize==0){
+                payloadSize=1;
+            }
             return nextNumber;
         } else {
             return -42;
@@ -26,7 +32,7 @@ public class StopAndWait implements SequenceStrategy {
     @Override
     public void recieveAck(int ackNumber) {
         if (ackNumber == nextNumber){
-            nextNumber++;
+            nextNumber += payloadSize;
             hasNextAvailible = true;
         }
     }

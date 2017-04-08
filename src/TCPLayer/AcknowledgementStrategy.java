@@ -7,11 +7,15 @@ import java.util.LinkedList;
  */
 public class AcknowledgementStrategy {
 
-    LinkedList<Integer> acks;
+    private LinkedList<Integer> acks;
+    private boolean doubleSeq;
+    public boolean trippleSeq;
 
     public AcknowledgementStrategy(){
         acks = new LinkedList<>();
-        acks.add(1);
+        acks.add(0);
+        doubleSeq = false;
+        trippleSeq = false;
     }
 
 
@@ -20,10 +24,25 @@ public class AcknowledgementStrategy {
         if (acks.size() > 1){
             acks.removeFirst();
         }
+        doubleSeq = false;
+        trippleSeq = false;
         return toReturn;
     }
 
     public void recievedMSG(int seq){
+        if (acks.contains(seq) && doubleSeq){
+            trippleSeq = true;
+            doubleSeq = false;
+        } else if (acks.contains(seq)){
+            doubleSeq = true;
+        }
+        if (acks.size() == 1 && acks.contains(0)){
+            acks.clear();
+        }
         acks.add(seq);
+    }
+
+    public boolean moreToAck(){
+        return acks.size()>1;
     }
 }

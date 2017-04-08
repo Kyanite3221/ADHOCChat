@@ -68,6 +68,9 @@ public class BytewiseUtilities {
     }
 
     public static final String printBytes(byte[] toPrint) {
+        if (toPrint == null){
+            return "Empty array";
+        }
         String result="";
         for (byte b : toPrint) {
             result += String.format(" 0x%02X",b);
