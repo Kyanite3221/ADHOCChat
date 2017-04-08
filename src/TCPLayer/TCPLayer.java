@@ -9,15 +9,16 @@ import java.util.LinkedList;
 public class TCPLayer {
 
     private static final int TIMEOUT = 1000;
-    private static final int MAX_PAYLOAD_SIZE = 230;
+    private static final int MAX_PAYLOAD_SIZE = 5;
 
-    SequenceStrategy sequenceGetter;
-    AcknowledgementStrategy ackGetter;
+    private SequenceStrategy sequenceGetter;
+    private AcknowledgementStrategy ackGetter;
 
-    LinkedList<TCPMessage> sendingQueue;
-    HashMap<TCPMessage, Integer> waitingForAck;
-    TCPMessage tableMessage;
-    LinkedList<byte[]> messageData;
+    private LinkedList<TCPMessage> sendingQueue;
+    private HashMap<TCPMessage, Integer> waitingForAck;
+    private TCPMessage tableMessage;
+    private LinkedList<byte[]> messageData;
+    private String name;
 
 
     //Richard's class, waaraan ik de messageData moet geven
@@ -27,6 +28,18 @@ public class TCPLayer {
         ackGetter = new AcknowledgementStrategy();
         sendingQueue = new LinkedList<TCPMessage>();
         waitingForAck = new HashMap<TCPMessage, Integer>();
+        tableMessage = null;
+        name = "no Name";
+
+    }
+
+    public TCPLayer(String name){
+        sequenceGetter = new StopAndWait();
+        ackGetter = new AcknowledgementStrategy();
+        sendingQueue = new LinkedList<TCPMessage>();
+        waitingForAck = new HashMap<TCPMessage, Integer>();
+        tableMessage = null;
+        this.name = name;
 
     }
 
@@ -38,6 +51,7 @@ public class TCPLayer {
             for (int i = 0; i < MAX_PAYLOAD_SIZE; i++) {
                 chunck[i] = data[(chunckCounter*MAX_PAYLOAD_SIZE)+i];
             }
+            //System.arraycopy(data, chunckCounter*MAX_PAYLOAD_SIZE, chunck, 0, MAX_PAYLOAD_SIZE);
 
             this.messageData.add(chunck);
             chunckCounter++;
@@ -74,46 +88,35 @@ public class TCPLayer {
     }
 
     public LinkedList<TCPMessage> tick(){
-        //Method if I have direct sending access
-//        for (TCPMessage toSend : sendingQueue) {
-//            networkLayer.Send(toSend.toByte());
-//            waitingForAck.put(toSend, TIMEOUT);
-//        }
-//        for (TCPMessage keys : waitingForAck.keySet()) {
-//            int timeOut;
-//            timeOut = waitingForAck.get(keys);
-//            if (timeOut == 0) {
-//                networkLayer.Send(keys.toByte());
-//                timeOut = TIMEOUT + 1;
-//            }
-//            waitingForAck.put(keys, timeOut-1);
-//
-//        }
-        //Method if I can return a whole LinkedList<TCPMessage>
-//        LinkedList<TCPMessage> toReturn = new LinkedList<TCPMessage>();
-//        for (TCPMessage toSend : sendingQueue) {
-//           toReturn.add(toSend);
-//           waitingForAck.put(toSend, TIMEOUT);
-//        }
-//
-//        for (TCPMessage keys : waitingForAck.keySet()) {
-//           int timeOut;
-//            timeOut = waitingForAck.get(keys);
-//            if (timeOut == 0) {
-//                toReturn.add(keys);
-//                timeOut = TIMEOUT + 1;
-//            }
-//            waitingForAck.put(keys, timeOut-1);
-//
-//        }
-//        return toReturn;
-        return null;
+
+        LinkedList<TCPMessage> toReturn = new LinkedList<TCPMessage>();
+
+        if (tableMessage != null){
+            toReturn.add(tableMessage);
+            tableMessage = null;
+        }
+
+        for (TCPMessage toSend : sendingQueue) {
+           toReturn.add(toSend);
+           waitingForAck.put(toSend, TIMEOUT);
+        }
+
+        for (TCPMessage keys : waitingForAck.keySet()) {
+           int timeOut;
+            timeOut = waitingForAck.get(keys);
+            if (timeOut == 0) {
+                toReturn.add(keys);
+                timeOut = TIMEOUT + 1;
+            }
+            waitingForAck.put(keys, timeOut-1);
+
+        }
+        return toReturn;
     }
 
-    public byte[] recievedMessage(byte[] networkInfo){
+    public TCPMessage recievedMessage(byte[] networkInfo){
         TCPMessage recieved = new TCPMessage(networkInfo);
-
-        return null;
+        return recieved;
     }
 
     public int hashData(byte[] data){

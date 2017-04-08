@@ -1,7 +1,8 @@
 package Tests;
 
-import TCPLayer.TCPMessage;
-import Utilities.BytewiseUtilities;
+import TCPLayer.*;
+
+import java.util.LinkedList;
 
 /**
  * Created by freem on 4/7/2017.
@@ -9,15 +10,26 @@ import Utilities.BytewiseUtilities;
 public class TCPTests {
 
     public static void main(String[] args) {
-        byte[] myDat = new byte[3];
+        byte[] myDat = new byte[10];
         myDat[0] = 0x00;
         myDat[1] = 0x00;
         myDat[2] = 0x01;
-        long ttime = System.currentTimeMillis();
-        TCPMessage myTCPMessage = new TCPMessage(Integer.MAX_VALUE,Integer.MAX_VALUE-1, ttime,14, (byte)0xf3, (byte)0xd5, myDat);
-        System.out.println(myTCPMessage.toString());
-        byte[] byteTCP = myTCPMessage.toByte();
-        TCPMessage recreatedTCPMessage = new TCPMessage(byteTCP);
-        System.out.println(recreatedTCPMessage.toString());
+        myDat[3] = 0x00;
+        myDat[4] = 0x00;
+        myDat[5] = 0x01;
+        myDat[6] = 0x00;
+        myDat[7] = 0x00;
+        myDat[8] = 0x01;
+        myDat[9] = 0x01;
+
+        TCPLayer tCP = new TCPLayer();
+        tCP.createDataMessage(myDat);
+        tCP.createTCPMessage();
+        for (int i = 0; i < 3000; i++) {
+            LinkedList<TCPMessage> result = tCP.tick();
+            for ( TCPMessage MSG : result) {
+                MSG.toString();
+            }
+        }
     }
 }

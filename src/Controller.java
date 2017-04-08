@@ -1,6 +1,8 @@
 import IPLayer.IPLayer;
-import TCPLayer.TCPLayer;
+import TCPLayer.*;
 import View.View;
+
+import java.util.LinkedList;
 
 /**
  * Created by thomas on 7-4-17.
@@ -21,11 +23,18 @@ public class Controller {
 				String receiver = "";
 
 				byte[] data = encodeToByteArray(plaintext);
-				byte[] tcpData = tcpLayer.createDataMessage(data, receiver);
-				byte[] ipData = ipLayer.addIPHeader(tcpData);
 
-				//TODO: figure out how the fuck to send stuff aaaaahhhhh
-				send(ipData);
+				tcpLayer.createDataMessage(data);
+				tcpLayer.createTCPMessage();
+				LinkedList<TCPMessage> tcpDataList = tcpLayer.tick();
+
+				for(TCPMessage tcpData : tcpDataList){
+					byte[] ipData = ipLayer.addIPHeader(tcpData.toByte());
+					//TODO: figure out how the fuck to send stuff aaaaahhhhh
+					send(ipData);
+				}
+
+
 			}
 		}
 	}
