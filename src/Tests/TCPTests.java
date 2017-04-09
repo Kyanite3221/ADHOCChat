@@ -26,7 +26,7 @@ public class TCPTests {
         tCP.createDataMessage(myDat);
         LinkedList<TCPMessage> recieved = new LinkedList<TCPMessage>();
         TCPLayer reciever = new TCPLayer("Bob");
-        for (int i = 0; i < 65210; i++) {
+        for (int i = 0; i < 4000; i++) {
             LinkedList<TCPMessage> result = tCP.tick();
             for ( TCPMessage MSG : result) {
                 System.out.println(MSG.toString());

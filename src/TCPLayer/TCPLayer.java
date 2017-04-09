@@ -9,7 +9,7 @@ import java.util.LinkedList;
 public class TCPLayer {
 
     private static final int TIMEOUT = 1000;
-    private static final int MAX_PAYLOAD_SIZE = 4;
+    private static final int MAX_PAYLOAD_SIZE = 230;
 
     private SequenceStrategy sequenceGetter;
     private AcknowledgementStrategy ackGetter;
