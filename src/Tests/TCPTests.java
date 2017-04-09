@@ -10,6 +10,11 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
+        (new TCPTests()).multipleSmallMessages();
+
+    }
+
+    private void timeOutAndPriorityOverride(){
         byte[] myDat = new byte[10];
         myDat[0] = 0x12;
         myDat[1] = 0x34;
@@ -40,6 +45,58 @@ public class TCPTests {
             }
 
         }
+    }
+
+    public void multipleSmallMessages() {
+        byte[] myDat = new byte[4];
+        TCPLayer tCP = new TCPLayer();
+        myDat[0] = (byte)0x0f;
+        myDat[1] = (byte)0x0a;
+        myDat[2] = (byte)0x0c;
+        myDat[3] = (byte)0x0e;
+        tCP.createDataMessage(myDat);
+        myDat[0] = (byte)0x0d;
+        myDat[1] = (byte)0x0e;
+        myDat[2] = (byte)0x0e;
+        myDat[3] = (byte)0x0d;
+        tCP.createDataMessage(myDat);
+        LinkedList<TCPMessage> tickData = tCP.tick();
+        TCPMessage result = tickData.removeFirst();
+        System.out.println(result.toString());
+        for (int i = 0; i < 1000; i++) {
+            LinkedList<TCPMessage> currentTick = tCP.tick();
+            for (TCPMessage msg: currentTick){
+                tickData.add(msg);
+            }
+        }
+        System.out.println(tickData.size());
+
+        TCPLayer reciever = new TCPLayer();
+        LinkedList<TCPMessage> recieverList = new LinkedList<TCPMessage>();
+        for (int i = 0; i < 3000; i++) {
+            LinkedList<TCPMessage> currentTick = tCP.tick();
+            LinkedList<TCPMessage> recievedList = reciever.tick();
+            for (TCPMessage msg: currentTick){
+                reciever.recievedMessage(msg.toByte());
+            }
+
+            for (TCPMessage msg: recievedList) {
+                recieverList.add(msg);
+            }
+        }
+        for (TCPMessage msg: recieverList){
+            System.out.println(msg.toString()+"\n");
+            tCP.recievedMessage(msg.toByte());
+        }
+
+        TCPMessage firstPacket = tCP.tick().getFirst();
+        System.out.println(firstPacket.toString());
+
+        myDat[0] = (byte)0x0c;
+        myDat[1] = (byte)0x0a;
+        myDat[2] = (byte)0x0a;
+        myDat[3] = (byte)0x0b;
+        tCP.createDataMessage(myDat);
 
     }
 }
