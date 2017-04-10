@@ -32,6 +32,7 @@ public class SequenceWindow implements SequenceStrategy{
 
     @Override
     public int getNextSeqNumber(int payloadLength) {
+        outstanding.add(nextToSendValue);
         nextToSendValue++;
         return nextToSendValue-1;
 
