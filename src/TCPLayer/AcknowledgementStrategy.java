@@ -23,6 +23,9 @@ public class AcknowledgementStrategy {
         int toReturn = acks.getFirst();
         if (acks.size() > 1){
             acks.removeFirst();
+        } else {
+            acks.add(0);
+            acks.removeFirst();
         }
         doubleSeq = false;
         trippleSeq = false;
@@ -43,6 +46,6 @@ public class AcknowledgementStrategy {
     }
 
     public boolean moreToAck(){
-        return acks.size()>1;
+        return (acks.size()>1 || (acks.size() == 1 && !acks.contains(0)));
     }
 }

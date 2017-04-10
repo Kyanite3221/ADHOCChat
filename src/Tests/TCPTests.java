@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
-        (new TCPTests()).multipleSmallMessages();
+        (new TCPTests()).regularComunicationTest();
 
     }
 
@@ -98,5 +98,39 @@ public class TCPTests {
         myDat[3] = (byte)0x0b;
         tCP.createDataMessage(myDat);
 
+    }
+
+    public void regularComunicationTest(){
+        TCPLayer annie = new TCPLayer("Annie");
+        TCPLayer bob = new TCPLayer("Bob");
+        byte[] data = new byte[8];
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
+
+        annie.createDataMessage(data);
+        LinkedList<TCPMessage> annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+        LinkedList<TCPMessage> bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
     }
 }

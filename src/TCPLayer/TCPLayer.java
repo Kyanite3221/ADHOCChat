@@ -11,6 +11,18 @@ public class TCPLayer {
     private static final int TIMEOUT = 1000;
     private static final int MAX_PAYLOAD_SIZE = 230;
 
+    public static final byte CONNECTION_ESTABLISHMENT_PORT = 0x01;
+    public static final byte MESSAGE_DELIVERY_PORT = 0x02;
+    public static final byte FILE_DELIVERY_PORT = 0x03;
+    public static final byte ACK_ONLY_PORT = 0x06;
+
+    public static final byte SYN_FLAG = 0x01;
+    public static final byte ACK_FLAG = 0x02;
+    public static final byte SYN_ACK_FLAG = 0x03;
+    public static final byte FIN_FLAG = 0x04;
+    public static final byte FIN_ACK_FLAG = 0x06;
+    public static final byte ROUTING_FLAG = 0x08;
+
     private SequenceStrategy sequenceGetter;
     private AcknowledgementStrategy ackGetter;
 
@@ -81,7 +93,7 @@ public class TCPLayer {
      */
     public void createPingMessage(byte[] tableInformation){ //works with any amount of messageData, but the tables shoudln't
                                                         // be too large, as it will all be fitted into a single packet
-        priorityMessage = new TCPMessage( 0,0,0, hashData(tableInformation), (byte)0x00, (byte)0x08, tableInformation);
+        priorityMessage = new TCPMessage( 0,0,0, hashData(tableInformation), (byte)0x00, ROUTING_FLAG , tableInformation);
     }
 
     /**
@@ -90,7 +102,12 @@ public class TCPLayer {
     public void createTCPMessage() {//works with the size limit of the messageData
         while (sequenceGetter.hasNextAvailible() && messageData.size() > 0){
             byte[] toCreate = messageData.removeFirst();
-            TCPMessage msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), ackGetter.nextAck(), System.currentTimeMillis(), hashData(toCreate), (byte)0x02, (byte)0x02, toCreate);
+            TCPMessage msg;
+            if (ackGetter.moreToAck()){
+                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), ackGetter.nextAck(), System.currentTimeMillis(), hashData(toCreate), ACK_FLAG, MESSAGE_DELIVERY_PORT, toCreate);
+            } else {
+                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), 0, System.currentTimeMillis(), hashData(toCreate), (byte)0x00, MESSAGE_DELIVERY_PORT, toCreate);
+            }
             sendingQueue.add(msg);
         }
     }
@@ -125,9 +142,10 @@ public class TCPLayer {
             waitingForAck.put(keys, timeOut-1);
 
         }
+
         if (toReturn.size() == 0 && (ackGetter.moreToAck() || ackGetter.trippleSeq)){
             ackGetter.trippleSeq = false;
-            priorityMessage = new TCPMessage(0,ackGetter.nextAck(),System.currentTimeMillis(),0,(byte)0x06,(byte)0x02,null);
+            priorityMessage = new TCPMessage(0,ackGetter.nextAck(),System.currentTimeMillis(),0,ACK_ONLY_PORT,ACK_FLAG,null);
         }
         return toReturn;
     }
@@ -148,9 +166,9 @@ public class TCPLayer {
             System.out.println("Data message recieved.\n\n");
         } else if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
             if (received.getFlags()== 1){ //SYN
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,(byte)0x01,(byte)0x03,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
             } else if (received.getFlags() == 3){ //SYN/ACK
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,(byte)0x01,(byte)0x02,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
                 connectionEstablished = true;
             }
         } else if (received.getPort() == 6){//Ack-only message
