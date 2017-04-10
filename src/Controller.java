@@ -22,6 +22,7 @@ public class Controller {
 			InetAddress addr = InetAddress.getByName(ADHOC_ADDRESS);
 			socket = new DatagramSocket();
 			socket.connect(addr, DUMMY_PORT);
+			socket.setBroadcast(true);
 
 			DatagramPacket recieveBuffer =
 					new DatagramPacket(new byte[IPLayer.MAX_PACKET_SIZE], IPLayer.MAX_PACKET_SIZE);
@@ -60,12 +61,11 @@ public class Controller {
 
 			socket.send(new DatagramPacket(new byte[] {0,0,0,0,0}, 5, addr, DUMMY_PORT));
 
-			while (true) {
-				socket.receive(recieveBuffer);
-				System.out.println("Hello world");
-				System.out.println("la");
-				System.out.println(Arrays.toString(recieveBuffer.getData()));
-			}
+			socket.receive(recieveBuffer);
+			System.out.println("Hello world");
+			System.out.println("la");
+			System.out.println(Arrays.toString(recieveBuffer.getData()));
+
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
