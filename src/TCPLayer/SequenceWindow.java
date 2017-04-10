@@ -32,6 +32,7 @@ public class SequenceWindow implements SequenceStrategy{
 
     @Override
     public int getNextSeqNumber(int payloadLength) {
+        outstanding.add(nextToSendValue);
         nextToSendValue++;
         return nextToSendValue-1;
 
@@ -39,7 +40,19 @@ public class SequenceWindow implements SequenceStrategy{
 
     @Override
     public void recieveAck(int ackNumber) {
+        if (outstanding.size() <1 ){
+            return;
+        }
 
+        if (ackNumber == outstanding.getFirst()){
+            outstanding.removeFirst();
+            while (ached.contains(outstanding.getFirst())){
+                ached.remove(outstanding.getFirst());
+                outstanding.removeFirst();
+            }
+        } else {
+            ached.add(ackNumber);
+        }
     }
 
     @Override
@@ -47,8 +60,11 @@ public class SequenceWindow implements SequenceStrategy{
         return outstanding.size() < maxSize;
     }
 
-    @Override
+    @Override@Deprecated
     public void reset() {
-
+        maxSize = 10;
+        nextToSendValue = 42;
+        outstanding = new LinkedList<>();
+        ached = new HashSet<>();
     }
 }
