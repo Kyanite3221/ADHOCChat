@@ -2,13 +2,30 @@ import IPLayer.IPLayer;
 import TCPLayer.*;
 import View.View;
 
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
 import java.util.LinkedList;
 
 /**
  * Created by thomas on 7-4-17.
  */
 public class Controller {
+	private static final String ADHOC_ADDRESS = "192.168.5.0";
+
 	public static void main(String[] args) {
+		try {
+			InetAddress addr = InetAddress.getByName(ADHOC_ADDRESS);
+			DatagramSocket socket = new DatagramSocket();
+			socket.
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+
 		View view = new View();
 		Thread viewThread = new Thread(view);
 
