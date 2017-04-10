@@ -120,6 +120,105 @@ public class TCPTests {
             annie.recievedMessage(msg.toByte());
         }
 
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
+
+        bob.createDataMessage(data);
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
+
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
+
+        annie.createDataMessage(data);
+        annieData = annie.tick();
+        for (TCPMessage msg : annieData){
+            System.out.println(msg);
+            bob.recievedMessage(msg.toByte());
+        }
+
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
+        Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
+
+        bob.createDataMessage(data);
+        bobData = bob.tick();
+
+        for (TCPMessage msg : bobData){
+            System.out.println(msg);
+            annie.recievedMessage(msg.toByte());
+        }
         annieData = annie.tick();
         for (TCPMessage msg : annieData){
             System.out.println(msg);
