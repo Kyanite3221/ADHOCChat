@@ -1,6 +1,6 @@
 import IPLayer.IPLayer;
 import TCPLayer.*;
-//import View.View;
+import View.View;
 
 import java.io.IOException;
 import java.net.*;
@@ -26,8 +26,8 @@ public class Controller {
 			DatagramPacket recieveBuffer =
 					new DatagramPacket(new byte[IPLayer.MAX_PACKET_SIZE], IPLayer.MAX_PACKET_SIZE);
 
-			//View view = new View();
-			//Thread viewThread = new Thread(view);
+			View view = new View();
+			Thread viewThread = new Thread(view);
 
 			TCPLayer tcpLayer = new TCPLayer();
 			IPLayer ipLayer = new IPLayer();
@@ -56,6 +56,7 @@ public class Controller {
 //				socket.receive(recieveBuffer);
 //				System.out.println(Arrays.toString(recieveBuffer.getData()));
 //			}
+
 			socket.send(new DatagramPacket(new byte[] {0,0,0,0,0}, 5, addr, DUMMY_PORT));
 
 			while (true) {
