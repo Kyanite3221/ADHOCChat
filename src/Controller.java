@@ -1,4 +1,4 @@
-import IPLayer.IPLayer;
+import IPLayer.*;
 import TCPLayer.*;
 //import View.View;
 
@@ -31,6 +31,9 @@ public class Controller {
 
 			TCPLayer tcpLayer = new TCPLayer();
 			IPLayer ipLayer = new IPLayer();
+			AddressMap addressmap = new AddressMap();
+
+
 
 //			while (true) {
 //				if (view.hasMessage()) {
