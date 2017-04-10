@@ -56,6 +56,7 @@ public class TCPLayer {
         waitingForAck = new HashMap<TCPMessage, Integer>();
         sequenceToTCP = new HashMap<Integer, TCPMessage>();
         dataBuffer = new LinkedList<>();
+        misplacedData = new HashMap<Integer, TCPMessage>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
@@ -72,6 +73,7 @@ public class TCPLayer {
         waitingForAck = new HashMap<TCPMessage, Integer>();
         sequenceToTCP = new HashMap<Integer, TCPMessage>();
         dataBuffer = new LinkedList<>();
+        misplacedData = new HashMap<Integer, TCPMessage>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
