@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class TCPLayer {
 
     private static final int TIMEOUT = 1000;
-    private static final int MAX_PAYLOAD_SIZE = 229;// one less than the actual value you want
+    private static final int MAX_PAYLOAD_SIZE = 3;// one less than the actual value you want
 
     public static final byte CONNECTION_ESTABLISHMENT_PORT = 0x01;
     public static final byte MESSAGE_DELIVERY_PORT = 0x02;
@@ -43,7 +43,7 @@ public class TCPLayer {
     private String name;
     private boolean connectionEstablished;
 
-    private ArrayList<byte[]> dataBuffer;
+    private LinkedList<byte[]> dataBuffer;
     private HashMap<Integer, TCPMessage> misplacedData;
     private int lastSequenceProcessed;
 
@@ -55,7 +55,7 @@ public class TCPLayer {
         sendingQueue = new LinkedList<TCPMessage>();
         waitingForAck = new HashMap<TCPMessage, Integer>();
         sequenceToTCP = new HashMap<Integer, TCPMessage>();
-        dataBuffer = new ArrayList<>();
+        dataBuffer = new LinkedList<>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
@@ -71,7 +71,7 @@ public class TCPLayer {
         sendingQueue = new LinkedList<TCPMessage>();
         waitingForAck = new HashMap<TCPMessage, Integer>();
         sequenceToTCP = new HashMap<Integer, TCPMessage>();
-        dataBuffer = new ArrayList<>();
+        dataBuffer = new LinkedList<>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
@@ -86,25 +86,32 @@ public class TCPLayer {
             byte[] chunck = new byte[data.length+1];
             System.arraycopy(data, 0, chunck, 1, data.length);
             chunck[0] = SELF_CONTAINED_DATA_MESSAGE;
+            this.messageData.add(chunck);
+            return;
         } else {
             byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];
             chunck[0] = FIRST_AND_MORE_DATA_TO_COME;
             System.arraycopy(data, 0, chunck, 1, MAX_PAYLOAD_SIZE);
+            this.messageData.add(chunck);
         }
 
         int chunckCounter = 1;
         byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];//because we want to add flags for the end of data or if there is no more data.
         while ((chunckCounter+1)*MAX_PAYLOAD_SIZE <= data.length){
             chunck[0] = MORE_DATA_TO_COME;
-            System.arraycopy(data, chunckCounter*MAX_PAYLOAD_SIZE, chunck, 1, MAX_PAYLOAD_SIZE);
+            System.out.println(Utilities.BytewiseUtilities.printBytes(data));
+            for (int i = 0; i < MAX_PAYLOAD_SIZE; i++) {
+                chunck[i+1] = data[(chunckCounter*MAX_PAYLOAD_SIZE)+i];
+            }
 
             this.messageData.add(chunck);
             chunckCounter++;
         }
 
         if (data.length%(MAX_PAYLOAD_SIZE+1)==0){//if there is no "leftover message"
-            byte[] repairs = this.messageData.getLast();
+            byte[] repairs = this.messageData.removeLast();
             repairs[0] = NO_MORE_DATA_TO_COME;
+            this.messageData.addLast(repairs);
         }
 
         chunck = new byte[1+(data.length%MAX_PAYLOAD_SIZE)];
