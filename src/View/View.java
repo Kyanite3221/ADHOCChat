@@ -21,7 +21,7 @@ public class View implements Runnable {
 	public void run() {
 		waitForInput();
 	}
-	
+
 	private void waitForInput() {
 		boolean exit = false;
 		Scanner in = new Scanner(System.in);
@@ -74,7 +74,7 @@ public class View implements Runnable {
 		}
 		in.close();
 	}
-	
+
 	private void writeMessage() {
 		if(inputStack.size() > 0) {
 			String input = inputStack.poll();
@@ -90,7 +90,7 @@ public class View implements Runnable {
 	public String pollMessage() {
 		return messageStack.poll();
 	}
-	
+
 	public void addMessage(String message) {
 		inputStack.put(message);
 	}
