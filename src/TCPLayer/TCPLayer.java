@@ -104,9 +104,9 @@ public class TCPLayer {
             byte[] toCreate = messageData.removeFirst();
             TCPMessage msg;
             if (ackGetter.moreToAck()){
-                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), ackGetter.nextAck(), System.currentTimeMillis(), hashData(toCreate), ACK_FLAG, MESSAGE_DELIVERY_PORT, toCreate);
+                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), ackGetter.nextAck(), System.currentTimeMillis(), hashData(toCreate), MESSAGE_DELIVERY_PORT, ACK_FLAG, toCreate);
             } else {
-                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), 0, System.currentTimeMillis(), hashData(toCreate), (byte)0x00, MESSAGE_DELIVERY_PORT, toCreate);
+                msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), 0, System.currentTimeMillis(), hashData(toCreate), MESSAGE_DELIVERY_PORT, (byte)0, toCreate);
             }
             sendingQueue.add(msg);
         }
@@ -145,7 +145,7 @@ public class TCPLayer {
 
         if (toReturn.size() == 0 && (ackGetter.moreToAck() || ackGetter.trippleSeq)){
             ackGetter.trippleSeq = false;
-            priorityMessage = new TCPMessage(0,ackGetter.nextAck(),System.currentTimeMillis(),0,ACK_ONLY_PORT,ACK_FLAG,null);
+            toReturn.add(new TCPMessage(0,ackGetter.nextAck(),System.currentTimeMillis(),0,ACK_ONLY_PORT,ACK_FLAG,null));
         }
         return toReturn;
     }
@@ -153,10 +153,15 @@ public class TCPLayer {
     public TCPMessage recievedMessage(byte[] networkInfo){
         TCPMessage received = new TCPMessage(networkInfo);//data is converted into a sensible data format.
 
+        int recievedHash = hashData(received.getPayload());
+        if (recievedHash != received.getDataHash()){
+            System.out.println("\n!!!!WRONG HASH DATA!!!!\n");
+            return null;
+        }
+
         if (sequenceToTCP.containsKey(received.getAcknowledgeNumber())){ //if the acknowledgement number is one for a message that we sent,
                                                                         //remove it from the waiting list and make sure that
                                                                        // the sequence getter can continue.
-            System.out.println("Key was contained...??????????????\n\n");
             waitingForAck.remove(sequenceToTCP.get(received.getAcknowledgeNumber()));
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
         }
@@ -173,11 +178,17 @@ public class TCPLayer {
             }
         } else if (received.getPort() == 6){//Ack-only message
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
+
         }
         return received;
     }
 
     public int hashData(byte[] data){
-        return data[0]*17;
+        int result = 0;
+        for (int i = 0; i < data.length; i++) {
+            result += data[i];
+        }
+        result = Integer.hashCode(result);
+        return result;
     }//to be properly implemented
 }
