@@ -28,6 +28,7 @@ public class Controller {
 
 			View view = new View();
 			Thread viewThread = new Thread(view);
+			viewThread.start();
 
 			TCPLayer tcpLayer = new TCPLayer();
 			IPLayer ipLayer = new IPLayer();
