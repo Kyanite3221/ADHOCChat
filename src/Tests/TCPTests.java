@@ -235,6 +235,16 @@ public class TCPTests {
 
     public void sequenceWindowTest(){
         SequenceWindow need = new SequenceWindow(10);
-        
+        LinkedList<Integer> numbers = new LinkedList<>();
+        for (int i = 0; i < 14; i++) {
+            if (need.hasNextAvailible()){
+                numbers.add(need.getNextSeqNumber(1));
+            }
+        }
+        System.out.println("Size is: " + numbers.size());
+
+        for (Integer i : numbers){
+            System.out.println(i);
+        }
     }
 }

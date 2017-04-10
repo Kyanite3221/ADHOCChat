@@ -11,7 +11,7 @@ public class View implements Runnable {
 	private Queue<String> messageStack = new LinkedBlockingQueue<>();
 	private Queue<String> inputStack = new LinkedBlockingQueue<>();
 	private Timer timer = new Timer();
-	private final DELAY = 5;
+	private final int DELAY = 5;
 
 	public View() {
 		new Thread(new View()).start();
