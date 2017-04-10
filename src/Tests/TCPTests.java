@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
-        (new TCPTests()).sequenceWindowTest();
+        (new TCPTests()).multipleSmallMessages();
 
     }
 
