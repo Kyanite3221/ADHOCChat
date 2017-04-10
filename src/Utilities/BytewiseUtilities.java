@@ -67,6 +67,18 @@ public class BytewiseUtilities {
         return large;
     }
 
+    public static final <E> E[] allArrayInsertion(E[] small, E[] large, int beginPosition){
+        if (large.length < small.length+beginPosition){
+            return null;
+        }
+
+        for (int i = beginPosition; i < small.length + beginPosition ; i++) {
+            large[i] = small[i-beginPosition];
+        }
+
+        return large;
+    }
+
     public static final String printBytes(byte[] toPrint) {
         if (toPrint == null){
             return "Empty array";
