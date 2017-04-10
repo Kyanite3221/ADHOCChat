@@ -1,9 +1,6 @@
 package View;
 
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Stack;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -12,6 +9,7 @@ public class View implements Runnable {
 	private Queue<String> inputStack = new LinkedBlockingQueue<>();
 	private Timer timer = new Timer();
 	private final int DELAY = 5;
+	private String name;
 
 	public View() {
 		new Thread(new View()).start();
@@ -28,7 +26,12 @@ public class View implements Runnable {
 		System.out.println("Please give your name");
 		name = in.nextLine();
 		while(true) {
-			timer.schedule(writeMessage(), DELAY);
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					writeMessage();
+				}
+			}, DELAY);
 			if(in.hasNextLine()) {
 				boolean send = true;
 				String line = in.nextLine();
@@ -64,7 +67,7 @@ public class View implements Runnable {
 					}
 				}
 				else if(send) {
-					messageStack.put(name + ": " + line);
+					messageStack.add(name + ": " + line);
 					System.out.println(name + ": " + line);
 				}
 			}
@@ -92,6 +95,6 @@ public class View implements Runnable {
 	}
 
 	public void addMessage(String message) {
-		inputStack.put(message);
+		inputStack.add(message);
 	}
 }
