@@ -325,12 +325,14 @@ public class TCPLayer {
 
         } else if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
             if (received.getFlags()== 1){ //SYN
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
                 connectionEstablished = true;
+                return new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
 
             } else if (received.getFlags() == 3){ //SYN/ACK
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
                 connectionEstablished = true;
+
+                return new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
+
             }
         } else if (received.getPort() == 6){//Ack-only message
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
