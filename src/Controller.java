@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by thomas on 7-4-17.
@@ -31,39 +30,46 @@ public class Controller {
 		Thread viewThread = new Thread(view);
 		viewThread.start();
 
-		MulticastSocket socket = createMulticastSocket();
+		try {
+			MulticastSocket socket = createMulticastSocket();
+			timer.scheduleAtFixedRate(getReceiveRunnable(socket), 0, 100, TimeUnit.MILLISECONDS);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		timer.scheduleAtFixedRate()
 
 		//multicastLoop();
 	}
 
-	private static MulticastSocket createMulticastSocket() {
+	private static MulticastSocket createMulticastSocket() throws IOException {
 		InetAddress group = InetAddress.getByAddress(ADHOC_GROUP);
 		MulticastSocket socket = new MulticastSocket(DUMMY_PORT);
 		socket.joinGroup(group);
+		return socket;
 	}
 
-	private static Runnable getRecieveRunnable(MulticastSocket s) {
-		return () -> {
-			while (true) {
-				byte[] ipBuffer = new byte[IP_HEADER_LENGTH];
-				DatagramPacket ipData = new DatagramPacket(ipBuffer, IP_HEADER_LENGTH);
+	private static Runnable getReceiveRunnable(MulticastSocket s) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					byte[] ipBuffer = new byte[IP_HEADER_LENGTH];
+					DatagramPacket ipData = new DatagramPacket(ipBuffer, IP_HEADER_LENGTH);
 
-				try {
-					//Receive will block until enough data is available
-					s.receive(ipData);
-				} catch (IOException e) {
-					e.printStackTrace();
+					try {
+						//Receive will block until enough data is available
+						s.receive(ipData);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					byte[] srcIP = new byte[4];
+					System.arraycopy(ipData, 12, srcIP, 0, 4);
+					IPLayer ipLayer = new IPLayer();
+					if (! ipLayer.isOwnIP(srcIP)) {
+
+					}
 				}
-
-				byte[] srcIP = new byte[4];
-				System.arraycopy(ipData, 12, srcIP, 0, 4);
-				IPLayer ipLayer = new IPLayer();
-				Objects.equals(srcIP,ipLayer.inettobyte(ipLayer.getInetAddress()));
-				//check if it is own ip address
-
-
 			}
 		};
 	}

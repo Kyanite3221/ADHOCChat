@@ -17,7 +17,7 @@ public class IPLayer {
 		return null;
 	}
 
-	public String getInetAddress() {
+	public String getOwnIP() {
 		try {
 			return InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e) {
@@ -26,14 +26,25 @@ public class IPLayer {
 		return null;
 	}
 
-	public Byte[] inettobyte(String inet) {
+	public byte[] ipStringToByteArray(String inet) {
 		String[] strings = new String[4];
 		strings = inet.split(".");
-		Byte[] bytes = new Byte[strings.length];
+		byte[] bytes = new byte[strings.length];
 		for (int i = 0; i < strings.length; i++) {
 			bytes[i] =Byte.parseByte(strings[i]);
 		}
 		return bytes;
+	}
+
+	public boolean isOwnIP(byte[] address) {
+		byte[] ownIp = ipStringToByteArray(getOwnIP());
+		boolean differenceFound = false;
+		for (int i = 0; i < 4; i++) {
+			if (address[i] != ownIp[i]) {
+				differenceFound = true;
+			}
+		}
+		return !differenceFound;
 	}
 
 }
