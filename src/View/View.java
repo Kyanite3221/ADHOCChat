@@ -1,7 +1,6 @@
 package View;
 
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
@@ -11,9 +10,7 @@ public class View implements Runnable {
 	private final int DELAY = 5;
 	private String name;
 
-	public View() {
-		new Thread(new View()).start();
-	}
+	public View() {}
 
 	@Override
 	public void run() {
@@ -72,6 +69,7 @@ public class View implements Runnable {
 				}
 			}
 			if(exit) {
+				System.exit(0);
 				break;
 			}
 		}

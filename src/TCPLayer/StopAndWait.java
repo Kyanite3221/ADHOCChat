@@ -32,7 +32,7 @@ public class StopAndWait implements SequenceStrategy {
     @Override
     public void recieveAck(int ackNumber) {
         if (ackNumber == nextNumber){
-            nextNumber += payloadSize;
+            nextNumber += 1;
             hasNextAvailible = true;
         }
     }

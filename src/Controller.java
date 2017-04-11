@@ -1,6 +1,6 @@
 import IPLayer.*;
 import TCPLayer.*;
-//import View.View;
+import View.View;
 
 import java.io.IOException;
 import java.net.*;
@@ -22,12 +22,14 @@ public class Controller {
 			InetAddress addr = InetAddress.getByName(ADHOC_ADDRESS);
 			socket = new DatagramSocket();
 			socket.connect(addr, DUMMY_PORT);
+			socket.setBroadcast(true);
 
 			DatagramPacket recieveBuffer =
 					new DatagramPacket(new byte[IPLayer.MAX_PACKET_SIZE], IPLayer.MAX_PACKET_SIZE);
 
-			//View view = new View();
-			//Thread viewThread = new Thread(view);
+			View view = new View();
+			Thread viewThread = new Thread(view);
+			viewThread.start();
 
 			TCPLayer tcpLayer = new TCPLayer();
 			IPLayer ipLayer = new IPLayer();
@@ -59,14 +61,14 @@ public class Controller {
 //				socket.receive(recieveBuffer);
 //				System.out.println(Arrays.toString(recieveBuffer.getData()));
 //			}
+
 			socket.send(new DatagramPacket(new byte[] {0,0,0,0,0}, 5, addr, DUMMY_PORT));
 
-			while (true) {
-				socket.receive(recieveBuffer);
-				System.out.println("Hello world");
-				System.out.println("la");
-				System.out.println(Arrays.toString(recieveBuffer.getData()));
-			}
+			socket.receive(recieveBuffer);
+			System.out.println("Hello world");
+			System.out.println("la");
+			System.out.println(Arrays.toString(recieveBuffer.getData()));
+
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
