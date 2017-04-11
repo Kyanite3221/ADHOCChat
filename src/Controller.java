@@ -25,29 +25,15 @@ public class Controller {
 		}
 	}
 
-	private static void clientLoop() {
-		InetAddress a = null;
-		try {
-			a = InetAddress.getByAddress(new byte[] {(byte) 192, (byte) 168, 5, 2});
-			Socket s = new Socket(a, DUMMY_PORT);
-			blockingReceiveLoop(s);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private static void multicastLoop() {
 		View view = new View();
 		Thread viewThread = new Thread(view);
 		viewThread.start();
 	}
 
-	private static void blockingReceiveLoop(Socket s) {
+	private static void blockingReceiveLoop(DataInputStream in) {
 		try {
-			DataOutputStream out = new DataOutputStream(s.getOutputStream());
-			DataInputStream in = new DataInputStream((s.getInputStream()));
+
 			while (true) {
 				byte[] packet = readPacket(in);
 			}
@@ -63,7 +49,10 @@ public class Controller {
 
 		int payload = ipHeaderBuffer[0] * 256 + ipHeaderBuffer[1];
 		byte[] payloadBuffer = new byte[payload];
-		in.read(payloadBuffer);
+
+		if (payload > 0) {
+			in.read(payloadBuffer);
+		}
 
 		byte[] packet = new byte[IP_HEADER_LENGTH + payload];
 		System.arraycopy(ipHeaderBuffer, 0, packet, 0, IP_HEADER_LENGTH);
@@ -72,12 +61,42 @@ public class Controller {
 		return packet;
 	}
 
+	private static void clientLoop() {
+		InetAddress a = null;
+		try {
+			a = InetAddress.getByAddress(new byte[] {(byte) 192, (byte) 168, 5, 2});
+			Socket s = new Socket(a, DUMMY_PORT);
+
+			DataOutputStream out = new DataOutputStream(s.getOutputStream());
+			DataInputStream in = new DataInputStream((s.getInputStream()));
+
+			blockingReceiveLoop(in);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static void serverLoop() {
 		try {
 			ServerSocket ss = new ServerSocket();
 			Socket s = ss.accept();
+
+			DataOutputStream out = new DataOutputStream(s.getOutputStream());
+			DataInputStream in = new DataInputStream((s.getInputStream()));
+
 			System.out.println("Connection accepted: " + s);
-			blockingReceiveLoop(s);
+			//blockingReceiveLoop(in);
+
+			try {
+				Thread.sleep(1000);
+				System.out.println("sending...");
+				out.write(new byte[] {0,0,1,2,3,4,5,6,7,8,9,1,2,3,4,5});
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
