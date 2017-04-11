@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class RoutingData {
     List<List<Integer>> data = new ArrayList<>();
-    private static int COLUMNS = 3;
+    private static int COLUMNS = 2;
 
     public void set(int row, int column, int value) {
         if (column < 0 || column >= COLUMNS) {

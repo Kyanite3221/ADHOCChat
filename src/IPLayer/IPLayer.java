@@ -1,5 +1,9 @@
 package IPLayer;
 
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * Created by thomas on 7-4-17.
  */
@@ -12,4 +16,14 @@ public class IPLayer {
 	public byte[] addIPHeader(byte[] tcpData) {
 		return null;
 	}
+
+	public InetAddress getInetAddress() {
+		try {
+			return InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }
