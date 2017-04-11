@@ -44,6 +44,7 @@ public class TCPLayer {
 
     private String name;
     private boolean connectionEstablished;
+    private int connectionTimeOut;
 
     private LinkedList<byte[]> dataBuffer;
     private HashMap<Integer, TCPMessage> misplacedData;
@@ -64,6 +65,7 @@ public class TCPLayer {
         messageData =  new LinkedList<>();
         name = "no Name";
         connectionEstablished = false;
+        connectionTimeOut = TIMEOUT;
 
 
     }
@@ -80,7 +82,12 @@ public class TCPLayer {
         priorityMessage = null;
         messageData =  new LinkedList<>();
         connectionEstablished = false;
+        connectionTimeOut = TIMEOUT;
         this.name = name;
+
+        if (name.equals("NO SETUP")){
+            connectionEstablished = true;
+        }
 
     }
 
@@ -178,6 +185,17 @@ public class TCPLayer {
      */
     public LinkedList<TCPMessage> tick(){
 
+        if (!connectionEstablished){
+            if (connectionTimeOut < 1){
+                LinkedList<TCPMessage> returnAble = new LinkedList<TCPMessage>();
+                returnAble.add(new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null));
+                return returnAble;
+            } else {
+                connectionTimeOut--;
+                return null;
+            }
+        }
+
         LinkedList<TCPMessage> toReturn = new LinkedList<TCPMessage>();
 
         createTCPMessage();
@@ -214,6 +232,11 @@ public class TCPLayer {
         return toReturn;
     }
 
+    /**
+     * This function handles incomming messages and replies apropriately if nececairy.
+     * @param networkInfo the TCPMessage in byte from that was supplied by the network layer.
+     * @return a properly formed TCP message with therein all the relevant data.
+     */
     public TCPMessage recievedMessage(@NotNull byte[] networkInfo){
         TCPMessage received = new TCPMessage(networkInfo);//data is converted into a sensible data format.
 
@@ -280,10 +303,9 @@ public class TCPLayer {
 
 
         } else if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
-
             if (received.getFlags()== 1){ //SYN
                 priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
-
+                connectionEstablished = true;
 
             } else if (received.getFlags() == 3){ //SYN/ACK
                 priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
@@ -296,7 +318,15 @@ public class TCPLayer {
         return null;
     }
 
+    public TCPMessage establishConnection(){
+        connectionEstablished = false;
+        return new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null);
+    }
+
     public int hashData(byte[] data){
+        if (data == null){
+            return 0;
+        }
         int result = 0;
         for (int i = 0; i < data.length; i++) {
             result += data[i];
