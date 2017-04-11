@@ -10,9 +10,9 @@ import java.util.Arrays;
 public class Controller {
 	private static final String ADHOC_ADDRESS = "192.168.5.0";
 	private static final byte[] ADHOC_GROUP = new byte[] {
-			(byte) 192,
-			(byte) 168,
-			(byte) 5,
+			(byte) 228,
+			(byte) 0,
+			(byte) 0,
 			(byte) 0};
 
 	private static final int DUMMY_PORT = 3000;
@@ -28,6 +28,8 @@ public class Controller {
 //		viewThread.start();
 
 		try {
+			byte computerID = 2;
+
 			InetAddress group = InetAddress.getByAddress(ADHOC_GROUP);
 			MulticastSocket socket = new MulticastSocket(DUMMY_PORT);
 			socket.joinGroup(group);
@@ -41,18 +43,24 @@ public class Controller {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					System.out.println(Arrays.toString(ipData.getData()));
+
+					if (ipData.getData()[1] != computerID) {
+						System.out.println(Arrays.toString(ipData.getData()));
+					}
 
 				}
 			};
 
 			Thread t = new Thread(r);
 			t.start();
+			byte i = 0;
+			byte j = computerID;
 
 			while (true) {
-				byte[] outBytes = new byte[]{0, 0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-				DatagramPacket outPacket = new DatagramPacket(outBytes, outBytes.length);
+				byte[] outBytes = new byte[]{i, j, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+				DatagramPacket outPacket = new DatagramPacket(outBytes, outBytes.length, group, DUMMY_PORT);
 				socket.send(outPacket);
+				i++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
