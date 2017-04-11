@@ -2,6 +2,7 @@ import View.View;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 
 /**
  * Created by thomas on 7-4-17.
@@ -36,6 +37,7 @@ public class Controller {
 
 			while (true) {
 				byte[] packet = readPacket(in);
+				System.out.println(Arrays.toString(packet));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -80,7 +82,7 @@ public class Controller {
 
 	private static void serverLoop() {
 		try {
-			ServerSocket ss = new ServerSocket();
+			ServerSocket ss = new ServerSocket(3000);
 			Socket s = ss.accept();
 
 			DataOutputStream out = new DataOutputStream(s.getOutputStream());
