@@ -69,6 +69,7 @@ public class View implements Runnable {
 				}
 			}
 			if(exit) {
+				System.exit(0);
 				break;
 			}
 		}
