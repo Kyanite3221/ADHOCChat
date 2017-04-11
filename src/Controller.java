@@ -1,10 +1,13 @@
+import IPLayer.IPLayer;
 import View.View;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -56,6 +59,8 @@ public class Controller {
 
 				byte[] srcIP = new byte[4];
 				System.arraycopy(ipData, 12, srcIP, 0, 4);
+				IPLayer ipLayer = new IPLayer();
+				Objects.equals(srcIP,ipLayer.inettobyte(ipLayer.getInetAddress()));
 				//check if it is own ip address
 
 
