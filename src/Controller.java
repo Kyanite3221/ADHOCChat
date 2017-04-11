@@ -2,33 +2,69 @@ import View.View;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 
 /**
  * Created by thomas on 7-4-17.
  */
 public class Controller {
 	private static final String ADHOC_ADDRESS = "192.168.5.0";
+	private static final byte[] ADHOC_GROUP = new byte[] {
+			(byte) 228,
+			(byte) 0,
+			(byte) 0,
+			(byte) 0};
+
 	private static final int DUMMY_PORT = 3000;
 	private static final int IP_HEADER_LENGTH = 16;
 
 	public static void main(String[] args) {
-		switch (args[0]) {
-			case "1":
-				serverLoop();
-				break;
-			case "2":
-				clientLoop();
-				break;
-			default:
-				multicastLoop();
-				break;
-		}
+		multicastLoop();
 	}
 
 	private static void multicastLoop() {
-		View view = new View();
-		Thread viewThread = new Thread(view);
-		viewThread.start();
+//		View view = new View();
+//		Thread viewThread = new Thread(view);
+//		viewThread.start();
+
+		try {
+			byte computerID = 2;
+
+			InetAddress group = InetAddress.getByAddress(ADHOC_GROUP);
+			MulticastSocket socket = new MulticastSocket(DUMMY_PORT);
+			socket.joinGroup(group);
+
+			Runnable r = () -> {
+				while (true) {
+					byte[] ipBuffer = new byte[IP_HEADER_LENGTH];
+					DatagramPacket ipData = new DatagramPacket(ipBuffer, IP_HEADER_LENGTH);
+					try {
+						socket.receive(ipData);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					if (ipData.getData()[1] != computerID) {
+						System.out.println(Arrays.toString(ipData.getData()));
+					}
+
+				}
+			};
+
+			Thread t = new Thread(r);
+			t.start();
+			byte i = 0;
+			byte j = computerID;
+
+			while (true) {
+				byte[] outBytes = new byte[]{i, j, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+				DatagramPacket outPacket = new DatagramPacket(outBytes, outBytes.length, group, DUMMY_PORT);
+				socket.send(outPacket);
+				i++;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void blockingReceiveLoop(DataInputStream in) {
@@ -36,6 +72,7 @@ public class Controller {
 
 			while (true) {
 				byte[] packet = readPacket(in);
+				System.out.println(Arrays.toString(packet));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -80,7 +117,7 @@ public class Controller {
 
 	private static void serverLoop() {
 		try {
-			ServerSocket ss = new ServerSocket();
+			ServerSocket ss = new ServerSocket(3000);
 			Socket s = ss.accept();
 
 			DataOutputStream out = new DataOutputStream(s.getOutputStream());
@@ -93,6 +130,8 @@ public class Controller {
 				Thread.sleep(1000);
 				System.out.println("sending...");
 				out.write(new byte[] {0,0,1,2,3,4,5,6,7,8,9,1,2,3,4,5});
+				Thread.sleep(10000);
+				s.close();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
