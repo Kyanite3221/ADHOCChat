@@ -43,6 +43,12 @@ public class StopAndWait implements SequenceStrategy {
     }
 
     @Override
+    public int getWindowSize() {
+        return 1;
+    }
+
+
+    @Override
     public void reset() {
         nextNumber = 1;
         hasNextAvailible = true;

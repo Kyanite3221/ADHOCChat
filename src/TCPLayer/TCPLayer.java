@@ -71,7 +71,7 @@ public class TCPLayer {
     }
 
     public TCPLayer(String name){
-        sequenceGetter = new StopAndWait();
+        sequenceGetter = new SequenceWindow(5,42);
         ackGetter = new AcknowledgementStrategy();
         sendingQueue = new LinkedList<TCPMessage>();
         waitingForAck = new HashMap<TCPMessage, Integer>();
@@ -88,8 +88,29 @@ public class TCPLayer {
         if (name.equals("NO SETUP")){
             connectionEstablished = true;
         }
-
     }
+
+    public TCPLayer(String name, int sequenceWindowSize){
+        sequenceGetter = new SequenceWindow(sequenceWindowSize, 42);
+        ackGetter = new AcknowledgementStrategy();
+        sendingQueue = new LinkedList<TCPMessage>();
+        waitingForAck = new HashMap<TCPMessage, Integer>();
+        sequenceToTCP = new HashMap<Integer, TCPMessage>();
+        dataBuffer = new LinkedList<>();
+        misplacedData = new HashMap<Integer, TCPMessage>();
+
+        priorityMessage = null;
+        messageData =  new LinkedList<>();
+        connectionEstablished = false;
+        connectionTimeOut = TIMEOUT;
+        this.name = name;
+
+        if (name.equals("NO SETUP")){
+            connectionEstablished = true;
+        }
+    }
+
+
 
 
     /**
@@ -225,7 +246,7 @@ public class TCPLayer {
 
         }
 
-        if (toReturn.size() == 0 && (ackGetter.moreToAck() || ackGetter.trippleSeq)){
+        while (toReturn.size() < sequenceGetter.getWindowSize() && (ackGetter.moreToAck() || ackGetter.trippleSeq)){
             ackGetter.trippleSeq = false;
             toReturn.add(new TCPMessage(0,ackGetter.nextAck(),System.currentTimeMillis(),0,ACK_ONLY_PORT,ACK_FLAG,null));
         }

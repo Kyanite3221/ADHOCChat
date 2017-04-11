@@ -8,6 +8,6 @@ import IPLayer.IPLayer;
 public class WhereTheFuckAmI {
     public static void main(String[] args) {
         IPLayer test = new IPLayer();
-        System.out.println(test.getInetAddress());
+        System.out.println(test.inettobyte(test.getInetAddress()));
     }
 }

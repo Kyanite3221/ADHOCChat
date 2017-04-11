@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
-        (new TCPTests()).multipleSmallMessages();
+        (new TCPTests()).overTheSequenceSize();
 
     }
 
@@ -39,7 +39,6 @@ public class TCPTests {
                 LinkedList<TCPMessage> imediateResult = reciever.tick();
                 for (TCPMessage message: imediateResult){
                     recieved.add(message);
-                    System.out.println(message);
                     tCP.recievedMessage(message.toByte());
                 }
             }
@@ -88,9 +87,6 @@ public class TCPTests {
             System.out.println(msg.toString()+"\n");
             tCP.recievedMessage(msg.toByte());
         }
-
-        TCPMessage firstPacket = tCP.tick().getFirst();
-        System.out.println(firstPacket.toString());
 
         myDat[0] = (byte)0x0c;
         myDat[1] = (byte)0x0a;
@@ -299,4 +295,66 @@ public class TCPTests {
 
         System.out.println("\nAnd then, if the first is acked, more are released.");
     }
+
+    public void overTheSequenceSize(){
+        TCPLayer bananaFace = new TCPLayer("NO SETUP", 5);
+        TCPLayer oreoFace = new TCPLayer("NO SETUP", 5);
+        byte[] uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+        uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        bananaFace.createDataMessage(uselessdata);
+
+        LinkedList<TCPMessage> returned= bananaFace.tick();
+        LinkedList<TCPMessage> recieverSent;
+        for (TCPMessage b: returned){
+            oreoFace.recievedMessage(b.toByte());
+        }
+        recieverSent = oreoFace.tick();
+
+        System.out.println(returned.size());
+        for(TCPMessage b :returned){
+            System.out.println(b);
+
+        }
+
+        System.out.println("\n\noreoFace returned " + recieverSent.size() + " messages\nsaying:\n\n");
+        for(TCPMessage b :recieverSent){
+            System.out.println(b);
+        }
+
+        bananaFace.recievedMessage(recieverSent.removeFirst().toByte());
+
+        returned = bananaFace.tick();
+        System.out.println("\n\n" + returned.size());
+        for(TCPMessage b :returned){
+            System.out.println(b);
+        }
+
+        for(TCPMessage b :recieverSent){
+            bananaFace.recievedMessage(b.toByte());
+        }
+
+        returned = bananaFace.tick();
+        System.out.println("\n\n" + returned.size());
+        for(TCPMessage b :returned){
+            System.out.println(b);
+        }
+
+    }
+
+
 }
