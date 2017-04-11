@@ -174,7 +174,7 @@ public class TCPLayer {
      * it also places any regular data that has been sent in a map with the timeout as the value, which it decrements every tick,
      * when that counter reaches 0, it resends the message.
      * finaly, if after that there is nothing to send, it checks if it has to ack anything anyway, if it does, it sends an ack only message.
-     * @return a TCPMessage with the data to send
+     * @return a TCPMessage with the data to send, to be slightly processed by the IP-layer and then to be sent
      */
     public LinkedList<TCPMessage> tick(){
 
