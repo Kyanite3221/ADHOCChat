@@ -17,9 +17,9 @@ public class IPLayer {
 		return null;
 	}
 
-	public InetAddress getInetAddress() {
+	public String getInetAddress() {
 		try {
-			return InetAddress.getLocalHost();
+			return InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
