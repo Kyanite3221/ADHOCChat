@@ -26,4 +26,14 @@ public class IPLayer {
 		return null;
 	}
 
+	public Byte[] inettobyte(String inet) {
+		String[] strings = new String[4];
+		strings = inet.split(".");
+		Byte[] bytes = new Byte[strings.length];
+		for (int i = 0; i < strings.length; i++) {
+			bytes[i] =Byte.parseByte(strings[i]);
+		}
+		return bytes;
+	}
+
 }
