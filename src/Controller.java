@@ -9,10 +9,17 @@ import java.util.Arrays;
  */
 public class Controller {
 	private static final String ADHOC_ADDRESS = "192.168.5.0";
+	private static final byte[] ADHOC_GROUP = new byte[] {
+			(byte) 192,
+			(byte) 168,
+			(byte) 5,
+			(byte) 0};
+
 	private static final int DUMMY_PORT = 3000;
 	private static final int IP_HEADER_LENGTH = 16;
 
 	public static void main(String[] args) {
+
 		switch (args[0]) {
 			case "1":
 				serverLoop();
@@ -27,9 +34,40 @@ public class Controller {
 	}
 
 	private static void multicastLoop() {
-		View view = new View();
-		Thread viewThread = new Thread(view);
-		viewThread.start();
+//		View view = new View();
+//		Thread viewThread = new Thread(view);
+//		viewThread.start();
+
+		try {
+			InetAddress group = InetAddress.getByAddress(ADHOC_GROUP);
+			MulticastSocket socket = new MulticastSocket(DUMMY_PORT);
+			socket.joinGroup(group);
+
+			Runnable r = () -> {
+				while (true) {
+					byte[] ipBuffer = new byte[IP_HEADER_LENGTH];
+					DatagramPacket ipData = new DatagramPacket(ipBuffer, IP_HEADER_LENGTH);
+					try {
+						socket.receive(ipData);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					System.out.println(Arrays.toString(ipData.getData()));
+
+				}
+			};
+
+			Thread t = new Thread(r);
+			t.start();
+
+			while (true) {
+				byte[] outBytes = new byte[]{0, 0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+				DatagramPacket outPacket = new DatagramPacket(outBytes, outBytes.length);
+				socket.send(outPacket);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void blockingReceiveLoop(DataInputStream in) {
@@ -95,6 +133,8 @@ public class Controller {
 				Thread.sleep(1000);
 				System.out.println("sending...");
 				out.write(new byte[] {0,0,1,2,3,4,5,6,7,8,9,1,2,3,4,5});
+				Thread.sleep(10000);
+				s.close();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
