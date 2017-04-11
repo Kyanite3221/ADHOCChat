@@ -54,6 +54,8 @@ public class Controller {
 					e.printStackTrace();
 				}
 
+				byte[] srcIP = new byte[4];
+				System.arraycopy(ipData, 12, srcIP, 0, 4);
 				//check if it is own ip address
 
 
