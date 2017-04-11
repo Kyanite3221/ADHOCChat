@@ -58,6 +58,10 @@ public class SequenceWindow implements SequenceStrategy{
         return outstanding.size() < maxSize;
     }
 
+    public int getWindowSize(){
+        return maxSize;
+    }
+
     @Override@Deprecated
     public void reset() {
         maxSize = 10;
