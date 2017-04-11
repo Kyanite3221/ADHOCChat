@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
-        (new TCPTests()).sequenceWindowTest();
+        (new TCPTests()).timeOutAndPriorityOverride();
 
     }
 
@@ -244,7 +244,59 @@ public class TCPTests {
         System.out.println("Size is: " + numbers.size());
 
         for (Integer i : numbers){
-            System.out.println(i);
+            System.out.print(i+" ");
         }
+
+        need.recieveAck(numbers.removeFirst());
+
+        LinkedList<Integer> newNumbers = new LinkedList<>();
+
+        for (int i = 0; i < 14; i++) {
+            if (need.hasNextAvailible()){
+                numbers.add(need.getNextSeqNumber(1));
+            }
+        }
+
+        System.out.println("\nSize is: " + numbers.size());
+
+        for (Integer i : numbers){
+            System.out.print(i+" ");
+        }
+
+        System.out.println("\nThis means that if an ack is received and it is the first, a new number is given free");
+
+        need.recieveAck(numbers.remove(1));
+        need.recieveAck(numbers.remove(1));
+
+
+        for (int i = 0; i < 14; i++) {
+            if (need.hasNextAvailible()){
+                numbers.add(need.getNextSeqNumber(1));
+            }
+        }
+
+        System.out.println("\nSize is: " + numbers.size());
+
+        for (Integer i : numbers){
+            System.out.print(i+" ");
+        }
+
+        System.out.println("\nThis means that if an ack is received and it is not the first, nothing changes");
+
+        need.recieveAck(numbers.removeFirst());
+
+
+
+        for (int i = 0; i < 14; i++) {
+            if (need.hasNextAvailible()){
+                numbers.add(need.getNextSeqNumber(1));
+            }
+        }
+
+        for (Integer i : numbers){
+            System.out.print(i+" ");
+        }
+
+        System.out.println("\nAnd then, if the first is acked, more are released.");
     }
 }

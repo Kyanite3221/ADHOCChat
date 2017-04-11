@@ -1,5 +1,7 @@
 package TCPLayer;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +13,7 @@ import java.util.LinkedList;
 public class TCPLayer {
 
     private static final int TIMEOUT = 1000;
-    private static final int MAX_PAYLOAD_SIZE = 3;// one less than the actual value you want
+    private static final int MAX_PAYLOAD_SIZE = 229;// one less than the actual value you want
 
     public static final byte CONNECTION_ESTABLISHMENT_PORT = 0x01;
     public static final byte MESSAGE_DELIVERY_PORT = 0x02;
@@ -50,7 +52,7 @@ public class TCPLayer {
     //Richard's class, waaraan ik de messageData moet geven
 
     public TCPLayer(){
-        sequenceGetter = new StopAndWait();
+        sequenceGetter = new SequenceWindow(5,42);
         ackGetter = new AcknowledgementStrategy();
         sendingQueue = new LinkedList<TCPMessage>();
         waitingForAck = new HashMap<TCPMessage, Integer>();
@@ -83,7 +85,15 @@ public class TCPLayer {
     }
 
 
-    public void createDataMessage (byte[] data){ //works with any amount of messageData.
+    /**
+     * Recieves an array of bytes, makes it to be an apropriate size and queue them for being made into full TCP messages
+     *
+     * @param data the byte[] of data that is to be sent
+     */
+    public void createDataMessage (@NotNull byte[] data ){ //works with any amount of messageData.
+        /**
+         * determine the first data chunck and add the apropriate data marks
+         */
         if(data.length <= MAX_PAYLOAD_SIZE){
             byte[] chunck = new byte[data.length+1];
             System.arraycopy(data, 0, chunck, 1, data.length);
@@ -97,6 +107,9 @@ public class TCPLayer {
             this.messageData.add(chunck);
         }
 
+        /**
+         * determines the next whole chunck(s) of data and adds the MORE_DATA_TO_COME marks
+         */
         int chunckCounter = 1;
         byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];//because we want to add flags for the end of data or if there is no more data.
         while ((chunckCounter+1)*MAX_PAYLOAD_SIZE <= data.length){
@@ -110,6 +123,9 @@ public class TCPLayer {
             chunckCounter++;
         }
 
+        /**
+         * if there is no final data left to add the EOF mark, it must be inserted into the last one
+         */
         if (data.length%(MAX_PAYLOAD_SIZE+1)==0){//if there is no "leftover message"
             byte[] repairs = this.messageData.removeLast();
             repairs[0] = NO_MORE_DATA_TO_COME;
@@ -151,6 +167,15 @@ public class TCPLayer {
         }
     }
 
+    /**
+     * the function that will be called every iteration of the controler object. It first checks if there are any
+     * priority messages to be sent, if there are it returns those.
+     * if not, it adds as much data as there are sequenceNumbers availible to the sending list.
+     * it also places any regular data that has been sent in a map with the timeout as the value, which it decrements every tick,
+     * when that counter reaches 0, it resends the message.
+     * finaly, if after that there is nothing to send, it checks if it has to ack anything anyway, if it does, it sends an ack only message.
+     * @return a TCPMessage with the data to send
+     */
     public LinkedList<TCPMessage> tick(){
 
         LinkedList<TCPMessage> toReturn = new LinkedList<TCPMessage>();
@@ -189,7 +214,7 @@ public class TCPLayer {
         return toReturn;
     }
 
-    public TCPMessage recievedMessage(byte[] networkInfo){
+    public TCPMessage recievedMessage(@NotNull byte[] networkInfo){
         TCPMessage received = new TCPMessage(networkInfo);//data is converted into a sensible data format.
 
         int recievedHash = hashData(received.getPayload());

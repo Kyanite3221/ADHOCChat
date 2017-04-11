@@ -29,8 +29,8 @@ public class SequenceWindow implements SequenceStrategy{
     }
 
     @Override
-    public int getNextSeqNumber(int payloadLength) {
-        outstanding.add(nextToSendValue);
+    public int getNextSeqNumber(int payloadLength) {//simply adds the given number to the list of numbers
+        outstanding.add(nextToSendValue); //and returns it. this function must always be called after a call to hasNextAvailible()
         nextToSendValue++;
         return nextToSendValue-1;
 
@@ -38,17 +38,17 @@ public class SequenceWindow implements SequenceStrategy{
 
     @Override
     public void recieveAck(int ackNumber) {
-        if (outstanding.size() <1 ){
+        if (outstanding.size() < 1 ){//we get an ack that has no meaning, as we have no outstanding messages
             return;
         }
 
-        if (ackNumber == outstanding.getFirst()){
-            outstanding.removeFirst();
-            while (ached.contains(outstanding.getFirst())){
-                ached.remove(outstanding.getFirst());
+        if (ackNumber == outstanding.getFirst()) {//if the ack we recieved was the first that we sent,
+            outstanding.removeFirst();              //we want to remove it from the outstanding list, to clear up room for others.
+            while (outstanding.size() > 0 && ached.contains(outstanding.getFirst())){ //if the next outstanding has already been acked
+                ached.remove(outstanding.getFirst()); // we also want to clear that one up
                 outstanding.removeFirst();
             }
-        } else {
+        } else { // if it wasn't the first, we want to save the fact that it has been ack'ed
             ached.add(ackNumber);
         }
     }
