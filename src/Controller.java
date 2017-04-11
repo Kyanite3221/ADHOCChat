@@ -1,8 +1,14 @@
+import IPLayer.IPLayer;
 import View.View;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Created by thomas on 7-4-17.
@@ -18,8 +24,48 @@ public class Controller {
 	private static final int DUMMY_PORT = 3000;
 	private static final int IP_HEADER_LENGTH = 16;
 
+	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(4);
+
 	public static void main(String[] args) {
-		multicastLoop();
+		View view = new View();
+		Thread viewThread = new Thread(view);
+		viewThread.start();
+
+		MulticastSocket socket = createMulticastSocket();
+
+		timer.scheduleAtFixedRate()
+
+		//multicastLoop();
+	}
+
+	private static MulticastSocket createMulticastSocket() {
+		InetAddress group = InetAddress.getByAddress(ADHOC_GROUP);
+		MulticastSocket socket = new MulticastSocket(DUMMY_PORT);
+		socket.joinGroup(group);
+	}
+
+	private static Runnable getRecieveRunnable(MulticastSocket s) {
+		return () -> {
+			while (true) {
+				byte[] ipBuffer = new byte[IP_HEADER_LENGTH];
+				DatagramPacket ipData = new DatagramPacket(ipBuffer, IP_HEADER_LENGTH);
+
+				try {
+					//Receive will block until enough data is available
+					s.receive(ipData);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				byte[] srcIP = new byte[4];
+				System.arraycopy(ipData, 12, srcIP, 0, 4);
+				IPLayer ipLayer = new IPLayer();
+				Objects.equals(srcIP,ipLayer.inettobyte(ipLayer.getInetAddress()));
+				//check if it is own ip address
+
+
+			}
+		};
 	}
 
 	private static void multicastLoop() {
