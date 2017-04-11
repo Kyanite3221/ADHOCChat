@@ -19,18 +19,7 @@ public class Controller {
 	private static final int IP_HEADER_LENGTH = 16;
 
 	public static void main(String[] args) {
-
-		switch (args[0]) {
-			case "1":
-				serverLoop();
-				break;
-			case "2":
-				clientLoop();
-				break;
-			default:
-				multicastLoop();
-				break;
-		}
+		multicastLoop();
 	}
 
 	private static void multicastLoop() {
