@@ -37,6 +37,10 @@ public class TCPLayerMap {
     }
 
     public TCPMessage recievedMessage(@NotNull byte[] networkInfo, String receiver){
+        if (tcpMap.keySet().contains(receiver)){
+            return tcpMap.get(receiver).recievedMessage(networkInfo);
+        }
+        tcpMap.put(receiver, new TCPLayer(receiver));
         return tcpMap.get(receiver).recievedMessage(networkInfo);
     }
 
