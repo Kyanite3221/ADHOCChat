@@ -7,4 +7,5 @@ import java.util.HashMap;
  */
 public class RoutingProtocol {
     private HashMap<Integer, Route> forwardingTable= new HashMap<>();
+
 }
