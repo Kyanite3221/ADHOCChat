@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class TCPTests {
 
     public static void main(String[] args) {
-        (new TCPTests()).timeOutAndPriorityOverride();
+        (new TCPTests()).multipleSmallMessages();
 
     }
 
@@ -27,10 +27,10 @@ public class TCPTests {
         myDat[8] = (byte)0xce;
         myDat[9] = 0x12;
 
-        TCPLayer tCP = new TCPLayer();
+        TCPLayer tCP = new TCPLayer("NO SETUP");
         tCP.createDataMessage(myDat);
         LinkedList<TCPMessage> recieved = new LinkedList<TCPMessage>();
-        TCPLayer reciever = new TCPLayer("Bob");
+        TCPLayer reciever = new TCPLayer("NO SETUP");
         for (int i = 0; i < 4000; i++) {
             LinkedList<TCPMessage> result = tCP.tick();
             for ( TCPMessage MSG : result) {
@@ -49,7 +49,7 @@ public class TCPTests {
 
     public void multipleSmallMessages() {
         byte[] myDat = new byte[4];
-        TCPLayer tCP = new TCPLayer();
+        TCPLayer tCP = new TCPLayer("NO SETUP");
         myDat[0] = (byte)0x0f;
         myDat[1] = (byte)0x0a;
         myDat[2] = (byte)0x0c;
@@ -71,7 +71,7 @@ public class TCPTests {
         }
         System.out.println(tickData.size());
 
-        TCPLayer reciever = new TCPLayer();
+        TCPLayer reciever = new TCPLayer("NO SETUP");
         LinkedList<TCPMessage> recieverList = new LinkedList<TCPMessage>();
         for (int i = 0; i < 3000; i++) {
             LinkedList<TCPMessage> currentTick = tCP.tick();
@@ -101,8 +101,8 @@ public class TCPTests {
     }
 
     public void regularComunicationTest(){
-        TCPLayer annie = new TCPLayer("Annie");
-        TCPLayer bob = new TCPLayer("Bob");
+        TCPLayer annie = new TCPLayer("NO SETUP");
+        TCPLayer bob = new TCPLayer("NO SETUP");
         byte[] data = new byte[8];
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
