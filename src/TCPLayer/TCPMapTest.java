@@ -12,8 +12,8 @@ public class TCPMapTest {
     }
 
     private static void connectionSetup() {
-        TCPLayer.TCPLayer mapOne = new TCPLayer.TCPLayer();
-        TCPLayer.TCPLayer mapTwo = new TCPLayer.TCPLayer();
+        TCPLayer mapOne = new TCPLayer();
+        TCPLayer mapTwo = new TCPLayer();
         LinkedList<TCPMessage> responseOne = new LinkedList<TCPMessage>();
         byte[] uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
 
@@ -49,15 +49,15 @@ public class TCPMapTest {
         }
     }
 
-    public static void initialContact (TCPLayer.TCPLayer one, TCPLayer.TCPLayer two) {
+    public static void initialContact (TCPLayer one, TCPLayer two) {
         TCPMessage communicationChannel = one.connectToNewHost("two");
         communicationChannel = two.recievedMessage(communicationChannel.toByte(), "one");
         communicationChannel = one.recievedMessage(communicationChannel.toByte(), "two");
     }
 
     public static void testPriorityHierarchy(){
-        TCPLayer.TCPLayer hostOne = new TCPLayer.TCPLayer();
-        TCPLayer.TCPLayer hostTwo = new TCPLayer.TCPLayer();
+        TCPLayer hostOne = new TCPLayer();
+        TCPLayer hostTwo = new TCPLayer();
         initialContact(hostOne, hostTwo);
 
         byte[] messageData = new byte[1000];
