@@ -4,11 +4,9 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
-	private Queue<String> messageStack = new LinkedBlockingQueue<>();
-	private Queue<String> inputStack = new LinkedBlockingQueue<>();
-	private Timer timer = new Timer();
-	private final int DELAY = 5;
+	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
 	private String name;
+	private String ip = "";
 
 	public View() {}
 
@@ -23,12 +21,6 @@ public class View implements Runnable {
 		System.out.println("Please give your name");
 		name = in.nextLine();
 		while(true) {
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					writeMessage();
-				}
-			}, DELAY);
 			if(in.hasNextLine()) {
 				boolean send = true;
 				String line = in.nextLine();
@@ -52,7 +44,8 @@ public class View implements Runnable {
 						name = in.nextLine();
 						break;
 					case "/CONNECT":
-						System.out.println("Give the name of the person to contact");
+						System.out.println("Give the ip of the person to contact");
+						ip = in.nextLine();
 						break;
 					case "/EXIT":
 						System.out.println("Leaving chat");
@@ -64,7 +57,7 @@ public class View implements Runnable {
 					}
 				}
 				else if(send) {
-					messageStack.add(name + ": " + line);
+					messageStack.add(new Message(ip, name, line));
 					System.out.println(name + ": " + line);
 				}
 			}
@@ -76,11 +69,8 @@ public class View implements Runnable {
 		in.close();
 	}
 
-	private void writeMessage() {
-		if(inputStack.size() > 0) {
-			String input = inputStack.poll();
-			System.out.println(input);
-		}
+	public void writeMessage(Message message) {
+		System.out.println(message.getName() + ": " + message.getMessage());
 	}
 
 	public boolean hasMessage() {
@@ -88,11 +78,8 @@ public class View implements Runnable {
 	}
 
 
-	public String pollMessage() {
+	public Message pollMessage() {
 		return messageStack.poll();
 	}
 
-	public void addMessage(String message) {
-		inputStack.add(message);
-	}
 }
