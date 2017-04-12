@@ -12,7 +12,7 @@ public class RoutingProtocol {
     private HashMap<byte[], MyRoute> forwardingTable= new HashMap<>();
     IPLayer ipLayer = new IPLayer();
     byte[] myAddress = ipLayer.ipStringToByteArray(ipLayer.getOwnIP());
-    private MyRoute ownLocation = new MyRoute(myAddress,myAddress,0);
+    private MyRoute ownLocation = new MyRoute(myAddress,myAddress,0,"name");
 
     public void tick() {
         forwardingTable.put(myAddress,ownLocation);
