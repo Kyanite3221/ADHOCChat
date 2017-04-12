@@ -31,6 +31,16 @@ public class Controller {
 		viewThread.start();
 
 		try {
+			InetAddress adhocGroup = InetAddress.getByAddress(ADHOC_GROUP);
+			LinkLayer linkLayer = new LinkLayer(adhocGroup, DUMMY_PORT);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		try {
 			MulticastSocket socket = createMulticastSocket();
 			timer.scheduleAtFixedRate(getReceiveRunnable(socket), 0, 100, TimeUnit.MILLISECONDS);
 		} catch (IOException e) {
