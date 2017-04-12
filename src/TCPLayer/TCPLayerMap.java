@@ -12,7 +12,7 @@ public class TCPLayerMap {
     private HashMap<String, TCPStream> tcpMap;
 
     public TCPLayerMap(){
-        tcpMap = new HashMap<>();
+        tcpMap = new HashMap<String, TCPStream>();
         tcpMap.put("Broadcast", new TCPStream());
     }
 
