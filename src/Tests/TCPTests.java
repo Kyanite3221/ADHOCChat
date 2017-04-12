@@ -27,10 +27,10 @@ public class TCPTests {
         myDat[8] = (byte)0xce;
         myDat[9] = 0x12;
 
-        TCPLayer tCP = new TCPLayer("NO SETUP");
-        tCP.createDataMessage(myDat);
+        TCPStream tCP = new TCPStream("NO SETUP");
+        tCP.createMessageData(myDat);
         LinkedList<TCPMessage> recieved = new LinkedList<TCPMessage>();
-        TCPLayer reciever = new TCPLayer("NO SETUP");
+        TCPStream reciever = new TCPStream("NO SETUP");
         for (int i = 0; i < 4000; i++) {
             LinkedList<TCPMessage> result = tCP.tick();
             for ( TCPMessage MSG : result) {
@@ -48,17 +48,17 @@ public class TCPTests {
 
     public void multipleSmallMessages() {
         byte[] myDat = new byte[4];
-        TCPLayer tCP = new TCPLayer("NO SETUP");
+        TCPStream tCP = new TCPStream("NO SETUP");
         myDat[0] = (byte)0x0f;
         myDat[1] = (byte)0x0a;
         myDat[2] = (byte)0x0c;
         myDat[3] = (byte)0x0e;
-        tCP.createDataMessage(myDat);
+        tCP.createMessageData(myDat);
         myDat[0] = (byte)0x0d;
         myDat[1] = (byte)0x0e;
         myDat[2] = (byte)0x0e;
         myDat[3] = (byte)0x0d;
-        tCP.createDataMessage(myDat);
+        tCP.createMessageData(myDat);
         LinkedList<TCPMessage> tickData = tCP.tick();
         TCPMessage result = tickData.removeFirst();
         System.out.println(result.toString());
@@ -70,7 +70,7 @@ public class TCPTests {
         }
         System.out.println(tickData.size());
 
-        TCPLayer reciever = new TCPLayer("NO SETUP");
+        TCPStream reciever = new TCPStream("NO SETUP");
         LinkedList<TCPMessage> recieverList = new LinkedList<TCPMessage>();
         for (int i = 0; i < 3000; i++) {
             LinkedList<TCPMessage> currentTick = tCP.tick();
@@ -92,18 +92,18 @@ public class TCPTests {
         myDat[1] = (byte)0x0a;
         myDat[2] = (byte)0x0a;
         myDat[3] = (byte)0x0b;
-        tCP.createDataMessage(myDat);
+        tCP.createMessageData(myDat);
 
     }
 
     public void regularComunicationTest(){
-        TCPLayer annie = new TCPLayer("NO SETUP");
-        TCPLayer bob = new TCPLayer("NO SETUP");
+        TCPStream annie = new TCPStream("NO SETUP");
+        TCPStream bob = new TCPStream("NO SETUP");
         byte[] data = new byte[8];
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
 
-        annie.createDataMessage(data);
+        annie.createMessageData(data);
         LinkedList<TCPMessage> annieData = annie.tick();
         for (TCPMessage msg : annieData){
             System.out.println(msg);
@@ -119,7 +119,7 @@ public class TCPTests {
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
 
-        bob.createDataMessage(data);
+        bob.createMessageData(data);
         annieData = annie.tick();
         for (TCPMessage msg : annieData){
             System.out.println(msg);
@@ -198,7 +198,7 @@ public class TCPTests {
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
 
-        annie.createDataMessage(data);
+        annie.createMessageData(data);
         annieData = annie.tick();
         for (TCPMessage msg : annieData){
             System.out.println(msg);
@@ -208,7 +208,7 @@ public class TCPTests {
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 0);
         Utilities.BytewiseUtilities.arrayInsertion(Utilities.BytewiseUtilities.intToByteArray((int)(Math.random()*Integer.MAX_VALUE)),data, 4);
 
-        bob.createDataMessage(data);
+        bob.createMessageData(data);
         bobData = bob.tick();
 
         for (TCPMessage msg : bobData){
@@ -297,26 +297,26 @@ public class TCPTests {
     }
 
     public void overTheSequenceSize(){
-        TCPLayer bananaFace = new TCPLayer("NO SETUP", 5);
-        TCPLayer oreoFace = new TCPLayer("NO SETUP", 5);
+        TCPStream bananaFace = new TCPStream("NO SETUP", 5);
+        TCPStream oreoFace = new TCPStream("NO SETUP", 5);
         byte[] uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
          uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
         uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
-        bananaFace.createDataMessage(uselessdata);
+        bananaFace.createMessageData(uselessdata);
 
         LinkedList<TCPMessage> returned= bananaFace.tick();
         LinkedList<TCPMessage> recieverSent;

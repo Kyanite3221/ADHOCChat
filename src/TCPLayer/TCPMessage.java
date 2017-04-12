@@ -191,7 +191,7 @@ public class TCPMessage {
     public String toString() {
         return "This package has:\nSequence Number: " + sequenceNumber + "\nAcknowledgement Number: "
                 + acknowledgeNumber + "\nTimestamp: " + timeStamp + "\nData Hash: " + dataHash + "\nPort: " + port
-                + "\nFlags: " + flags + "\nPayload size: " + payloadSize + "\nAnd payload: " + Utilities.BytewiseUtilities.printBytes(payload);
+                + "\nFlags: " + flags + "\nPayload size: " + payloadSize + "\nfor the payload, call getPayload\n";
 
     }
 }

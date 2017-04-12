@@ -201,7 +201,7 @@ public class Controller {
 //			Thread viewThread = new Thread(view);
 //			viewThread.start();
 //
-//			TCPLayer tcpLayer = new TCPLayer();
+//			TCPStream tcpLayer = new TCPStream();
 //			IPLayer ipLayer = new IPLayer();
 //
 //
@@ -215,7 +215,7 @@ public class Controller {
 ////
 ////					byte[] data = encodeToByteArray(plaintext);
 ////
-////					tcpLayer.createDataMessage(data);
+////					tcpLayer.createMessageData(data);
 ////					tcpLayer.createTCPMessage();
 ////					LinkedList<TCPMessage> tcpDataList = tcpLayer.tick();
 ////

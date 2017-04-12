@@ -2,15 +2,13 @@ package TCPLayer;
 
 import com.sun.istack.internal.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
  * Created by freem on 4/7/2017.
  */
-public class TCPLayer {
+public class TCPStream {
 
     private static final int TIMEOUT = 1000;
     private static final int MAX_PAYLOAD_SIZE = 229;// one less than the actual value you want
@@ -41,28 +39,32 @@ public class TCPLayer {
     private HashMap<Integer, TCPMessage> sequenceToTCP;
     private TCPMessage priorityMessage;
     private LinkedList<byte[]> messageData;
+    private LinkedList<byte[]> fileData;
 
     private String name;
     private boolean connectionEstablished;
     private int connectionTimeOut;
 
-    private LinkedList<byte[]> dataBuffer;
+    private LinkedList<byte[]> recievedMessageData;
+    private LinkedList<byte[]> recievedFileData;
     private HashMap<Integer, TCPMessage> misplacedData;
     private int lastSequenceProcessed;
 
     //Richard's class, waaraan ik de messageData moet geven
 
-    public TCPLayer(){
+    public TCPStream(){
         sequenceGetter = new SequenceWindow(5,42);
         ackGetter = new AcknowledgementStrategy();
-        sendingQueue = new LinkedList<TCPMessage>();
-        waitingForAck = new HashMap<TCPMessage, Integer>();
-        sequenceToTCP = new HashMap<Integer, TCPMessage>();
-        dataBuffer = new LinkedList<>();
-        misplacedData = new HashMap<Integer, TCPMessage>();
+        sendingQueue = new LinkedList<>();
+        waitingForAck = new HashMap<>();
+        sequenceToTCP = new HashMap<>();
+        recievedMessageData = new LinkedList<>();
+        recievedFileData = new LinkedList<>();
+        misplacedData = new HashMap<>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
+        fileData = new LinkedList<>();
         name = "no Name";
         connectionEstablished = false;
         connectionTimeOut = TIMEOUT;
@@ -70,17 +72,19 @@ public class TCPLayer {
 
     }
 
-    public TCPLayer(String name){
+    public TCPStream(String name){
         sequenceGetter = new SequenceWindow(5,42);
         ackGetter = new AcknowledgementStrategy();
-        sendingQueue = new LinkedList<TCPMessage>();
-        waitingForAck = new HashMap<TCPMessage, Integer>();
-        sequenceToTCP = new HashMap<Integer, TCPMessage>();
-        dataBuffer = new LinkedList<>();
-        misplacedData = new HashMap<Integer, TCPMessage>();
+        sendingQueue = new LinkedList<>();
+        waitingForAck = new HashMap<>();
+        sequenceToTCP = new HashMap<>();
+        recievedMessageData = new LinkedList<>();
+        recievedFileData = new LinkedList<>();
+        misplacedData = new HashMap<>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
+        fileData = new LinkedList<>();
         connectionEstablished = false;
         connectionTimeOut = TIMEOUT;
         this.name = name;
@@ -90,17 +94,19 @@ public class TCPLayer {
         }
     }
 
-    public TCPLayer(String name, int sequenceWindowSize){
+    public TCPStream(String name, int sequenceWindowSize){
         sequenceGetter = new SequenceWindow(sequenceWindowSize, 42);
         ackGetter = new AcknowledgementStrategy();
-        sendingQueue = new LinkedList<TCPMessage>();
-        waitingForAck = new HashMap<TCPMessage, Integer>();
-        sequenceToTCP = new HashMap<Integer, TCPMessage>();
-        dataBuffer = new LinkedList<>();
-        misplacedData = new HashMap<Integer, TCPMessage>();
+        sendingQueue = new LinkedList<>();
+        waitingForAck = new HashMap<>();
+        sequenceToTCP = new HashMap<>();
+        recievedMessageData = new LinkedList<>();
+        recievedFileData = new LinkedList<>();
+        misplacedData = new HashMap<>();
 
         priorityMessage = null;
         messageData =  new LinkedList<>();
+        fileData = new LinkedList<>();
         connectionEstablished = false;
         connectionTimeOut = TIMEOUT;
         this.name = name;
@@ -112,13 +118,7 @@ public class TCPLayer {
 
 
 
-
-    /**
-     * Recieves an array of bytes, makes it to be an apropriate size and queue them for being made into full TCP messages
-     *
-     * @param data the byte[] of data that is to be sent
-     */
-    public void createDataMessage (@NotNull byte[] data ){ //works with any amount of messageData.
+    public void createMessageData(@NotNull byte[] data ){ //works with any amount of messageData.
         /**
          * determine the first data chunck and add the apropriate data marks
          */
@@ -142,7 +142,6 @@ public class TCPLayer {
         byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];//because we want to add flags for the end of data or if there is no more data.
         while ((chunckCounter+1)*MAX_PAYLOAD_SIZE <= data.length){
             chunck[0] = MORE_DATA_TO_COME;
-            System.out.println(Utilities.BytewiseUtilities.printBytes(data));
             for (int i = 0; i < MAX_PAYLOAD_SIZE; i++) {
                 chunck[i+1] = data[(chunckCounter*MAX_PAYLOAD_SIZE)+i];
             }
@@ -171,6 +170,64 @@ public class TCPLayer {
     }
 
     /**
+     * Does exactly the same as createMessageData, but purposed for files. this is done so that you could still send
+     * text messages while transfering a large file.
+     * Recieves an array of bytes, makes it to be an apropriate size and queue them for being made into full TCP messages
+     *
+     * @param data the byte[] of data that is to be sent
+     */
+    public void createFileData(@NotNull byte[] data ){ //works with any amount of messageData.
+        /**
+         * determine the first data chunck and add the apropriate data marks
+         */
+        if(data.length <= MAX_PAYLOAD_SIZE){
+            byte[] chunck = new byte[data.length+1];
+            System.arraycopy(data, 0, chunck, 1, data.length);
+            chunck[0] = SELF_CONTAINED_DATA_MESSAGE;
+            this.fileData.add(chunck);
+            return;
+        } else {
+            byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];
+            chunck[0] = FIRST_AND_MORE_DATA_TO_COME;
+            System.arraycopy(data, 0, chunck, 1, MAX_PAYLOAD_SIZE);
+            this.fileData.add(chunck);
+        }
+
+        /**
+         * determines the next whole chunck(s) of data and adds the MORE_DATA_TO_COME marks
+         */
+        int chunckCounter = 1;
+        byte[] chunck = new byte[MAX_PAYLOAD_SIZE+1];//because we want to add flags for the end of data or if there is no more data.
+        while ((chunckCounter+1)*MAX_PAYLOAD_SIZE <= data.length){
+            chunck[0] = MORE_DATA_TO_COME;
+            for (int i = 0; i < MAX_PAYLOAD_SIZE; i++) {
+                chunck[i+1] = data[(chunckCounter*MAX_PAYLOAD_SIZE)+i];
+            }
+
+            this.fileData.add(chunck);
+            chunckCounter++;
+        }
+
+        /**
+         * if there is no final data left to add the EOF mark, it must be inserted into the last one
+         */
+        if (data.length%(MAX_PAYLOAD_SIZE+1)==0){//if there is no "leftover message"
+            byte[] repairs = this.fileData.removeLast();
+            repairs[0] = NO_MORE_DATA_TO_COME;
+            this.fileData.addLast(repairs);
+        }
+
+        chunck = new byte[1+(data.length%MAX_PAYLOAD_SIZE)];
+        chunck[0] = NO_MORE_DATA_TO_COME;
+        for (int i = 0; i+(chunckCounter*MAX_PAYLOAD_SIZE) < data.length; i++) {
+            chunck[i+1] = data[(chunckCounter*MAX_PAYLOAD_SIZE) + i];
+        }
+
+        this.fileData.add(chunck);
+    }
+
+
+    /**
      * Creates a new TCPMessage which will be sent with priority in the next tick.
      * @param tableInformation the messageData which is to be sent.
      */
@@ -192,6 +249,18 @@ public class TCPLayer {
                 msg = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), 0, System.currentTimeMillis(), hashData(toCreate), MESSAGE_DELIVERY_PORT, (byte)0, toCreate);
             }
             sendingQueue.add(msg);
+        }
+
+        while (sequenceGetter.hasNextAvailible() && fileData.size() > 0){
+            byte[] toCreate = fileData.getFirst();
+            fileData.removeFirst();
+            TCPMessage msgTwo;
+            if (ackGetter.moreToAck()){
+                msgTwo = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), ackGetter.nextAck(), System.currentTimeMillis(), hashData(toCreate), FILE_DELIVERY_PORT, ACK_FLAG, toCreate);
+            } else {
+                msgTwo = new TCPMessage(sequenceGetter.getNextSeqNumber(toCreate.length), 0, System.currentTimeMillis(), hashData(toCreate), FILE_DELIVERY_PORT, (byte)0, toCreate);
+            }
+            sendingQueue.add(msgTwo);
         }
     }
 
@@ -276,7 +345,7 @@ public class TCPLayer {
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
         }
         // make sure that we ack the next message if it was a regular message to be Ack'ed
-        if (received.getPort()==2 || received.getPort()==3){
+        if (received.getPort()==2){
 
             ackGetter.recievedMSG(received.getSequenceNumber());
             System.out.println("Data message recieved.\n\n");
@@ -284,22 +353,22 @@ public class TCPLayer {
             if (received.getPayload()[0]==SELF_CONTAINED_DATA_MESSAGE){//the message that just came in is not part of a larger amount of data
                 return received; //and can thus be forwarded to the controller
             } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data
-                dataBuffer.clear(); //so a record needs to be kept of the order of this data.
+                recievedMessageData.clear(); //so a record needs to be kept of the order of this data.
                 misplacedData.clear();
-                dataBuffer.add(received.getPayload());
+                recievedMessageData.add(received.getPayload());
                 lastSequenceProcessed = received.getSequenceNumber();
                 return null;
             } else if (received.getPayload()[0] == NO_MORE_DATA_TO_COME){//this is the last packet of a sequence of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
-                dataBuffer.add(midStep);
+                recievedMessageData.add(midStep);
                 int finalSize=0;
-                for (byte[] b : dataBuffer) {
+                for (byte[] b : recievedMessageData) {
                     finalSize += b.length;
                 }
                 midStep = new byte[finalSize];
                 int counter = 0;
-                for(byte[] b: dataBuffer) {
+                for(byte[] b: recievedMessageData) {
                     for (byte byt: b){
                         midStep[counter] = byt;
                         counter++;
@@ -309,14 +378,63 @@ public class TCPLayer {
             } else if (lastSequenceProcessed + 1 == received.getSequenceNumber()){ //the message is part of a larger ammount of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
-                dataBuffer.add(midStep); //and needs to be placed in the correct order in that data.
+                recievedMessageData.add(midStep); //and needs to be placed in the correct order in that data.
                 lastSequenceProcessed++;
                 while (misplacedData.keySet().contains(lastSequenceProcessed)){ //this might have enabled more packets to be added into the
                     midStep = new byte[misplacedData.get(lastSequenceProcessed).getPayload().length-1];
                     System.arraycopy(misplacedData.get(lastSequenceProcessed).getPayload(), 1, midStep, 0, midStep.length);
-                    dataBuffer.add(midStep); //data order.
+                    recievedMessageData.add(midStep); //data order.
                     misplacedData.remove(lastSequenceProcessed);
                     lastSequenceProcessed++;
+                }
+            } else { //the message was not delivered in the right order, thus will be queued.
+                misplacedData.put(received.getSequenceNumber(), received);
+            }
+
+
+        } else if (received.getPort()==3){
+
+            ackGetter.recievedMSG(received.getSequenceNumber());
+            System.out.println("Data message recieved.\n\n");
+
+            if (received.getPayload()[0]==SELF_CONTAINED_DATA_MESSAGE){//the message that just came in is not part of a larger amount of data
+                return received; //and can thus be forwarded to the controller
+            } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data
+                recievedFileData.clear(); //so a record needs to be kept of the order of this data.
+                byte[] midStep = new byte[received.getPayload().length-1];
+                System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
+                recievedFileData.add(midStep);
+                misplacedData.clear();
+                lastSequenceProcessed = received.getSequenceNumber();
+                return null;
+            } else if (received.getPayload()[0] == NO_MORE_DATA_TO_COME){//this is the last packet of a sequence of data
+                byte[] midStep = new byte[received.getPayload().length-1];
+                System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
+                int finalSize=0;
+                recievedFileData.add(midStep);
+                for (byte[] b : recievedFileData) {
+                    finalSize += b.length;
+                }
+                midStep = new byte[finalSize];
+                int counter = 0;
+                for(byte[] b: recievedFileData) {
+                    for (byte byt: b){
+                        midStep[counter] = byt;
+                        counter++;
+                    }
+                }
+                return new TCPMessage(received.getSequenceNumber(), received.getAcknowledgeNumber(), received.getTimeStamp(), 0, received.getPort(), received.getFlags(), midStep);
+            } else if (lastSequenceProcessed + 1 == received.getSequenceNumber()){ //the message is part of a larger ammount of data
+                byte[] midStep = new byte[received.getPayload().length-1];
+                System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
+                lastSequenceProcessed++;
+                recievedFileData.add(midStep); //and needs to be placed in the correct order in that data.
+                while (misplacedData.keySet().contains(lastSequenceProcessed)){ //this might have enabled more packets to be added into the
+                    midStep = new byte[misplacedData.get(lastSequenceProcessed).getPayload().length-1];
+                    System.arraycopy(misplacedData.get(lastSequenceProcessed).getPayload(), 1, midStep, 0, midStep.length);
+                    recievedFileData.add(midStep); //data order.
+                    misplacedData.remove(lastSequenceProcessed);
+                    lastSequenceProcessed += 1;
                 }
             } else { //the message was not delivered in the right order, thus will be queued.
                 misplacedData.put(received.getSequenceNumber(), received);
@@ -336,7 +454,8 @@ public class TCPLayer {
             }
         } else if (received.getPort() == 6){//Ack-only message
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
-
+        } else if (received.getPort() == 0) {
+            return received;
         }
         return null;
     }
@@ -357,4 +476,8 @@ public class TCPLayer {
         result = Integer.hashCode(result);
         return result;
     }//to be properly implemented
+
+    public String getName() {
+        return name;
+    }
 }
