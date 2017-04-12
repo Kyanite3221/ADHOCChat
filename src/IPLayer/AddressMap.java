@@ -6,9 +6,9 @@ import java.util.*;
  * Created by Georg on 10-Apr-17.
  */
 public class AddressMap {
-    public HashMap<String, String> ipNameTable = new HashMap<>();
+    public HashMap<byte[], String> ipNameTable = new HashMap<>();
 
-    public void setIpNameTable(String ipaddress, String name) {
+    public void setIpNameTable(byte[] ipaddress, String name) {
         ipNameTable.put(ipaddress,name);
     }
 
@@ -16,8 +16,8 @@ public class AddressMap {
         return ipNameTable.containsValue(name);
     }
 
-    public String getIpaddress(String name) {
-        for (Map.Entry<String,String> entry: ipNameTable.entrySet()) {
+    public byte[] getIpaddress(String name) {
+        for (Map.Entry<byte[],String> entry: ipNameTable.entrySet()) {
             if (Objects.equals(entry.getValue(),name)) {
                 return entry.getKey();
             }
