@@ -15,10 +15,10 @@ public class TCPMapTest {
         TCPLayer mapOne = new TCPLayer();
         TCPLayer mapTwo = new TCPLayer();
         LinkedList<TCPMessage> responseOne = new LinkedList<TCPMessage>();
-        byte[] uselessdata = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
+        byte[] useless = Utilities.BytewiseUtilities.longToByteArray((long)(Math.random()*Long.MAX_VALUE));
 
         TCPMessage messageOne = mapOne.connectToNewHost("mapTwo");
-        mapOne.createMessageData(uselessdata,"mapTwo");
+        mapOne.createMessageData(useless,"mapTwo");
         responseOne = mapOne.tick("mapTwo");
         if (responseOne == null) {
             System.out.println("The first tick on mapOne, pre connect, was empty");
