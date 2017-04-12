@@ -8,11 +8,11 @@ import java.util.LinkedList;
 /**
  * Created by freem on 4/11/2017.
  */
-public class TCPLayerMap {
+public class TCPLayer {
     private HashMap<String, TCPStream> tcpMap;
 
-    public TCPLayerMap(){
-        tcpMap = new HashMap<String, TCPStream>();
+    public TCPLayer(){
+        tcpMap = new HashMap<>();
         tcpMap.put("Broadcast", new TCPStream());
     }
 
