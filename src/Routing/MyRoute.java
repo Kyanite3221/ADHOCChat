@@ -7,11 +7,13 @@ public class MyRoute {
     private byte[] destination;
     private byte[] nexthop;
     private int cost;
+    private String name;
 
-    public MyRoute (byte[] destination, byte[] nexthop, int cost) {
+    public MyRoute (byte[] destination, byte[] nexthop, int cost, String name) {
         this.destination = destination;
         this.nexthop = nexthop;
         this.cost = cost;
+        this.name = name;
     }
 
     public void setDestination (byte[] dest) {
@@ -26,6 +28,8 @@ public class MyRoute {
         this.cost = cost;
     }
 
+    public void setName (String name) {this.name = name;}
+
     public byte[] getDestination() {
         return destination;
     }
@@ -36,6 +40,10 @@ public class MyRoute {
 
     public int getCost() {
         return cost;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }
