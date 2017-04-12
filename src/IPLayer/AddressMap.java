@@ -30,7 +30,6 @@ public class AddressMap {
     }
 
     public Collection<String> allnames() {
-        System.out.println(1+1);
         return ipNameTable.values();
     }
 }
