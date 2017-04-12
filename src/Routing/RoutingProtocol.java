@@ -9,8 +9,13 @@ import java.util.HashMap;
  * Created by Georg on 11-Apr-17.
  */
 public class RoutingProtocol {
-    private HashMap<Byte[], MyRoute> forwardingTable= new HashMap<>();
+    private HashMap<byte[], MyRoute> forwardingTable= new HashMap<>();
     IPLayer ipLayer = new IPLayer();
     byte[] myAddress = ipLayer.ipStringToByteArray(ipLayer.getOwnIP());
-    MyRoute ownLocation = new MyRoute();
+    private MyRoute ownLocation = new MyRoute(myAddress,myAddress,0);
+
+    public void tick() {
+        forwardingTable.put(myAddress,ownLocation);
+    }
+
 }

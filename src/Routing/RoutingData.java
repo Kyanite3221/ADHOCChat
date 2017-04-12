@@ -9,6 +9,8 @@ public class RoutingData {
     List<List<Integer>> data = new ArrayList<>();
     private static int COLUMNS = 2;
 
+    public RoutingData(){}
+
     public void set(int row, int column, int value) {
         if (column < 0 || column >= COLUMNS) {
             throw new IllegalArgumentException("column does not exist");
@@ -25,4 +27,6 @@ public class RoutingData {
         }
         this.data.get(row).set(column,value);
     }
+
+
 }
