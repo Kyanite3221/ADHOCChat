@@ -13,7 +13,7 @@ public class TCPLayer {
 
     public TCPLayer(){
         tcpMap = new HashMap<>();
-        tcpMap.put("Broadcast", new TCPStream());
+        tcpMap.put("Broadcast", new TCPStream("NO SETUP"));
     }
 
     public TCPMessage connectToNewHost(String ipAdress){
