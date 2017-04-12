@@ -5,12 +5,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
-	private Queue<Message> inputStack = new LinkedBlockingQueue<>();
-	private Timer timer = new Timer();
-	private final int DELAY = 5;
 	private String name;
 	private String ip = "";
-	private Message message;
 
 	public View() {}
 
@@ -25,12 +21,6 @@ public class View implements Runnable {
 		System.out.println("Please give your name");
 		name = in.nextLine();
 		while(true) {
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					writeMessage();
-				}
-			}, DELAY);
 			if(in.hasNextLine()) {
 				boolean send = true;
 				String line = in.nextLine();
@@ -79,11 +69,8 @@ public class View implements Runnable {
 		in.close();
 	}
 
-	private void writeMessage() {
-		if(inputStack.size() > 0) {
-			Message input = inputStack.poll();
-			System.out.println(input);
-		}
+	public void writeMessage(Message message) {
+		System.out.println(message.getName() + ": " + message.getMessage());
 	}
 
 	public boolean hasMessage() {
@@ -95,7 +82,4 @@ public class View implements Runnable {
 		return messageStack.poll();
 	}
 
-	public void addMessage(Message message) {
-		inputStack.add(message);
-	}
 }
