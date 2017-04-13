@@ -41,4 +41,8 @@ public class AddressMap {
     public Collection<String> allnames() {
         return ipNameTable.values();
     }
+
+    public Collection<byte[]> allIPAddresses() {
+        return ipNameTable.keySet();
+    }
 }
