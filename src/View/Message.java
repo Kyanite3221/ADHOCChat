@@ -26,5 +26,10 @@ public class Message {
 	public boolean emptyIp() {
 		return (ip=="");
 	}
+	
+	@Override
+	public String toString() {
+		return ip + " " + name + " " + message;
+	}
 
 }
