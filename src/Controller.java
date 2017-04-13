@@ -5,13 +5,10 @@ import View.Message;
 import TCPLayer.TCPMessage;
 
 import IPLayer.AddressMap;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +50,7 @@ public class Controller {
 		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 1}, "OldShittyPc");
 		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 2}, "BetterLaptop");
 
-		view = new View();
+		view = new View(addressMap);
 		String name = view.getName();
 
 		Thread viewThread = new Thread(view);
@@ -61,14 +58,13 @@ public class Controller {
 
 //		for (byte[] address: addressMap.allIPAddresses()) {
 //
-//
 //		}
 
 		timer.scheduleAtFixedRate(() -> {
 			receiveFromLinkLayer();
 			sendFromApplicationLayer();
 			sendFromTCPLayer();
-		}, 0, 1000, TimeUnit.MILLISECONDS);
+		}, 0, 10, TimeUnit.MILLISECONDS);
 	}
 
 	public static void receiveFromLinkLayer() {
@@ -111,6 +107,7 @@ public class Controller {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
+			System.out.println(Arrays.toString(messageBytes));
 			tcpLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
@@ -135,6 +132,7 @@ public class Controller {
 						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
 
 						System.out.println(Arrays.toString(ipMessage));
+						System.out.println(Arrays.toString(message.getPayload()));
 
 						//linkLayer.send(ipMessage);
 						iter.remove();
