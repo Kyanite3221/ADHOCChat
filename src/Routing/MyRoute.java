@@ -42,8 +42,16 @@ public class MyRoute {
         return cost;
     }
 
+    public byte getCostAsByte () {
+        return (byte) cost;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public byte[] getNameAsByte () {
+        return name.getBytes();
     }
 
 }
