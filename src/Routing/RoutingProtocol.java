@@ -22,14 +22,6 @@ public class RoutingProtocol {
             forwardingTable.put(myAddress,ownLocation);
 
         }
-
-
-
-
-
-
-
-
     }
 
     public byte[] send() {
@@ -42,14 +34,41 @@ public class RoutingProtocol {
                 packetlist.add(forwardingTable.get(i).getNexthop()[k]);
             }
             packetlist.add(forwardingTable.get(i).getCostAsByte());
-            for (int l = 0; l < forwardingTable.get(i).getNameAsByte().length; l++) {
+            for (int l = 0; l < 8; l++) {
                 packetlist.add(forwardingTable.get(i).getNameAsByte()[l]);
             }
         }
-        Byte[] packet = new Byte[packetlist.size()];
-        packet = (Byte[]) packetlist.toArray();
-
-        return null;
+        byte[] packet = new byte[packetlist.size()];
+        Byte[] rpacket = new Byte[packetlist.size()];
+        rpacket = (Byte[]) packetlist.toArray();
+        packet = toPrimitivesbytes(rpacket);
+        return packet;
     }
 
+    public MyRoute[] readdata(byte[] data) {
+        MyRoute[] readdata = new MyRoute[data.length/17];
+        for (int i = 0; i < data.length/17;i++){
+            byte[] tempdest = new byte[4];
+            for (int j = 0; j < 4; j++)
+                tempdest[j] = data[i*17+j];
+            byte[] tempnhop = new byte[4];
+            for (int k = 0; k < 4; k++)
+                tempnhop[k] = data[i*17+4+k];
+            int tempcost = (int) data[i*17+8];
+            byte[] tempname = new byte[8];
+
+            MyRoute tempRoute = new MyRoute(tempdest,tempnhop,tempcost,tempname);
+            readdata[i] = tempRoute;
+        }
+        return readdata;
+    }
+
+
+    public byte[] toPrimitivesbytes (Byte[] rbytes) {
+        byte[] bytes = new byte[rbytes.length];
+        for(int i = 0;i < rbytes.length; i++) {
+            bytes[i] = rbytes[i];
+        }
+        return bytes;
+    }
 }

@@ -15,6 +15,12 @@ public class MyRoute {
         this.cost = cost;
         this.name = name;
     }
+    public MyRoute (byte[] destination, byte[] nexthop, int cost, byte[] name) {
+        this.destination = destination;
+        this.nexthop = nexthop;
+        this.cost = cost;
+
+    }
 
     public void setDestination (byte[] dest) {
         this.destination = dest;
