@@ -1,7 +1,5 @@
 package Tests;
 
-import EncryptionLayer.KeyPair;
-
 import java.math.BigInteger;
 import java.util.Random;
 

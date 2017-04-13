@@ -60,6 +60,14 @@ public class TCPLayer {
         return tcpMap.get(receiver).tick();
     }
 
+    public HashMap<String, LinkedList<TCPMessage>> allTick(){
+        HashMap<String, LinkedList<TCPMessage>> result = new HashMap<>();
+        for(TCPStream stream : tcpMap.values()){
+            result.put(stream.getName(),stream.tick());
+        }
+        return result;
+    }
+
     public LinkedList<TCPMessage> tick(){
         return tcpMap.get("Broadcast").tick();
     }
