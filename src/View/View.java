@@ -59,8 +59,9 @@ public class View implements Runnable {
 						name = in.nextLine();
 						break;
 					case "/CONNECT":
-						System.out.println("Give the ip of the person to contact");
+						System.out.println("Give the name of the person to contact");
 						ip = in.nextLine();
+						ip = (map.checkName(ip)) ? Arrays.toString(map.getIpaddress(ip)): "";
 						break;
 					case "/EXIT":
 						System.out.println("Leaving chat");
