@@ -11,17 +11,15 @@ public class RoutingProtocol {
     private String myname;
     private byte[] data;
 
-    public RoutingProtocol (String name, byte[] ownip){
-        this.myname = name;
-        this.myAddress = ownip;
+    public RoutingProtocol (String myname, byte[] myAddress){
+        this.myname = myname;
+        this.myAddress = myAddress;
         this.ownLocation = new MyRoute(myAddress,myAddress,0,"name");
+        forwardingTable.put(myAddress, ownLocation);
     }
 
     public void update(byte[] data, byte[] source) {
         MyRoute[] processedData = readdata(data, source);
-        if (!forwardingTable.containsKey(myAddress)) {
-            forwardingTable.put(myAddress,ownLocation);
-        }
         for (int i = 0; i < processedData.length; i++){
             if (!forwardingTable.containsKey(processedData[i].getDestination())) {
                 forwardingTable.put(processedData[i].getDestination(),processedData[i]);
