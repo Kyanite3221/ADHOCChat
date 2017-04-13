@@ -7,8 +7,12 @@ public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
 	private String name;
 	private String ip = "";
+	private Scanner in = new Scanner(System.in);
 
-	public View() {}
+	public View() {
+		System.out.println("Please give your name");
+		name = in.nextLine();
+	}
 
 	@Override
 	public void run() {
@@ -17,9 +21,6 @@ public class View implements Runnable {
 
 	private void waitForInput() {
 		boolean exit = false;
-		Scanner in = new Scanner(System.in);
-		System.out.println("Please give your name");
-		name = in.nextLine();
 		while(true) {
 			if(in.hasNextLine()) {
 				boolean send = true;
@@ -80,6 +81,10 @@ public class View implements Runnable {
 
 	public Message pollMessage() {
 		return messageStack.poll();
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 }
