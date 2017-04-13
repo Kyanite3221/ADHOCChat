@@ -18,9 +18,17 @@ public class RoutingProtocol {
     }
 
     public void update(byte[] data, byte[] source) {
+        MyRoute[] processedData = readdata(data, source);
         if (!forwardingTable.containsKey(myAddress)) {
             forwardingTable.put(myAddress,ownLocation);
-
+        }
+        for (int i = 0; i < processedData.length; i++){
+            if (!forwardingTable.containsKey(processedData[i].getDestination())) {
+                forwardingTable.put(processedData[i].getDestination(),processedData[i]);
+            }
+            if (forwardingTable.get(processedData[i].getDestination()).getCost() > processedData[i].getCost()) {
+                forwardingTable.replace(processedData[i].getDestination(),processedData[i]);
+            }
         }
     }
 
@@ -45,18 +53,19 @@ public class RoutingProtocol {
         return packet;
     }
 
-    public MyRoute[] readdata(byte[] data) {
+    public MyRoute[] readdata(byte[] data, byte[] source) {
         MyRoute[] readdata = new MyRoute[data.length/17];
         for (int i = 0; i < data.length/17;i++){
             byte[] tempdest = new byte[4];
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 4; j++) {
                 tempdest[j] = data[i*17+j];
-            byte[] tempnhop = new byte[4];
-            for (int k = 0; k < 4; k++)
-                tempnhop[k] = data[i*17+4+k];
-            int tempcost = (int) data[i*17+8];
+            }
+            byte[] tempnhop = source;
+            int tempcost = (int) data[i*17+8] + 1;
             byte[] tempname = new byte[8];
-
+            for (int l = 0; l<8; l++) {
+                tempname[l] = data[i*17+9+l];
+            }
             MyRoute tempRoute = new MyRoute(tempdest,tempnhop,tempcost,tempname);
             readdata[i] = tempRoute;
         }

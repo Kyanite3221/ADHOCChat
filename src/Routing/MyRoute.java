@@ -1,5 +1,7 @@
 package Routing;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by Georg on 11-Apr-17.
  */
@@ -19,7 +21,8 @@ public class MyRoute {
         this.destination = destination;
         this.nexthop = nexthop;
         this.cost = cost;
-
+        String tempname = new String(name);
+        this.name = tempname;
     }
 
     public void setDestination (byte[] dest) {
