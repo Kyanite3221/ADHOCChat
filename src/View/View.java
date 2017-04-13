@@ -16,7 +16,12 @@ public class View implements Runnable {
 		//new GUI().run();
 		System.out.println("Please give your name");
 		name = in.nextLine();
-		if(!(name.length()<8)) {
+		if(name.length()<8) {
+			for(int i = name.length(); i < 8; i++) {
+				name.concat(" ");
+			}
+		}
+		else {
 			name = name.substring(0, 7);
 		}
 	}
