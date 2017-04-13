@@ -3,13 +3,17 @@ package View;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import IPLayer.AddressMap;
+
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
 	private String name;
 	private String ip = "";
 	private Scanner in = new Scanner(System.in);
+	private AddressMap map;
 
 	public View() {
+		//new GUI().run();
 		System.out.println("Please give your name");
 		name = in.nextLine();
 	}
@@ -38,7 +42,8 @@ public class View implements Runnable {
 					String command = line.split(" ")[0];
 					switch(command) {
 					case "/LIST":
-						System.out.println("Here is a list");
+						System.out.println("Here is a list:");
+						System.out.println(map.allnames());
 						break;
 					case "/NAME":
 						System.out.println("Please give a new name");
