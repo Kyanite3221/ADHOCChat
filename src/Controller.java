@@ -107,7 +107,7 @@ public class Controller {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
-			System.out.println(Arrays.toString(messageBytes));
+			System.out.println(message.toString());
 			tcpLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
@@ -118,7 +118,6 @@ public class Controller {
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
 			linkLayer.send(ipMessage);
 		}
-
 
 		HashMap<String, LinkedList<TCPMessage>> list = tcpLayer.allTick();
 		if (list != null) {
@@ -131,10 +130,11 @@ public class Controller {
 						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
 						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
 
+						//If there was a TCPMessage, it would be printed here
 						System.out.println(Arrays.toString(ipMessage));
 						System.out.println(Arrays.toString(message.getPayload()));
 
-						linkLayer.send(ipMessage);
+						//linkLayer.send(ipMessage);
 						iter.remove();
 					}
 				}
