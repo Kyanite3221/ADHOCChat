@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * Created by thomas on 7-4-17.
@@ -42,7 +43,7 @@ public class IPLayer {
 
 	public String getOwnIP() {
 		try {
-			return InetAddress.getLocalHost().toString();
+			return InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -50,13 +51,23 @@ public class IPLayer {
 	}
 
 	public static byte[] ipStringToByteArray(String inet) {
-		String[] strings = new String[4];
-		strings = inet.split(".");
+		String[] strings = inet.split(Pattern.quote("."));
 		byte[] bytes = new byte[strings.length];
 		for (int i = 0; i < strings.length; i++) {
-			bytes[i] = Byte.parseByte(strings[i]);
+			bytes[i] = (byte) Integer.parseInt(strings[i]);
 		}
 		return bytes;
+	}
+
+	public static String ipByteArrayToString(byte[] ip) {
+		String ipString = "";
+		for (int i = 0; i < 4; i++) {
+			ipString += ip[i];
+			if (i != 3) {
+				ipString += ".";
+			}
+		}
+		return ipString;
 	}
 
 	public boolean isOwnIP(byte[] address) {

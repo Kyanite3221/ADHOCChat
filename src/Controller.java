@@ -5,10 +5,16 @@ import View.Message;
 import TCPLayer.TCPMessage;
 
 import IPLayer.AddressMap;
+import org.omg.PortableInterceptor.INACTIVE;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by thomas on 7-4-17.
@@ -29,14 +35,23 @@ public class Controller {
 	private static TCPLayer tcpLayer;
 	private static View view;
 
+	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+
 	private static AddressMap addressMap;
 
 	public static void main(String[] args) {
 		addressMap = new AddressMap();
+		try {
+			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
+			linkLayer = new LinkLayer(inetAddress, DUMMY_PORT);
+			ipLayer = new IPLayer();
+			tcpLayer = new TCPLayer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 1}, "OldShittyPc");
 		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 2}, "BetterLaptop");
-
 
 		view = new View();
 		String name = view.getName();
@@ -44,19 +59,16 @@ public class Controller {
 		Thread viewThread = new Thread(view);
 		viewThread.start();
 
-		try {
-			InetAddress adhocGroup = InetAddress.getByAddress(ADHOC_GROUP);
-			LinkLayer linkLayer = new LinkLayer(adhocGroup, DUMMY_PORT);
+//		for (byte[] address: addressMap.allIPAddresses()) {
+//
+//
+//		}
 
-			while (true) {
-
-			}
-
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		timer.scheduleAtFixedRate(() -> {
+			receiveFromLinkLayer();
+			sendFromApplicationLayer();
+			sendFromTCPLayer();
+		}, 0, 1000, TimeUnit.MILLISECONDS);
 	}
 
 	public static void receiveFromLinkLayer() {
@@ -64,7 +76,7 @@ public class Controller {
 
 		if (incoming != null) {
 			byte[] source = ipLayer.getSource(incoming);
-			String sourceString = IPLayer.getIPByteArrayAsString(source);
+			String sourceString = IPLayer.ipByteArrayToString(source);
 
 			switch (ipLayer.handlePacket(incoming)) {
 				case IGNORE:
@@ -99,7 +111,7 @@ public class Controller {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
-			TCPMessage tcpMessage = tcpLayer.createMessageData(messageBytes, message.getIp());
+			tcpLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
 
@@ -110,12 +122,24 @@ public class Controller {
 			linkLayer.send(ipMessage);
 		}
 
-		for (byte[] ipAddress : addressMap.allIPAddresses()) {
-			String ipString = IPLayer.getIPByteArrayAsString(ipAddress);
-			List<TCPMessage> list = tcpLayer.tick(ipString);
-			for (TCPMessage message : list) {
-				byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
-				linkLayer.send(ipMessage);
+
+		HashMap<String, LinkedList<TCPMessage>> list = tcpLayer.allTick();
+		if (list != null) {
+			for (Map.Entry<String, LinkedList<TCPMessage>> pair : list.entrySet()) {
+				if (pair.getValue() != null) {
+					Iterator<TCPMessage> iter = pair.getValue().iterator();
+
+					while (iter.hasNext()) {
+						TCPMessage message = iter.next();
+						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
+						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
+
+						System.out.println(Arrays.toString(ipMessage));
+
+						//linkLayer.send(ipMessage);
+						iter.remove();
+					}
+				}
 			}
 		}
 	}
