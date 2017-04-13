@@ -354,8 +354,10 @@ public class TCPStream {
                 return received; //and can thus be forwarded to the controller
             } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data
                 recievedMessageData.clear(); //so a record needs to be kept of the order of this data.
+                byte[] midStep = new byte[received.getPayload().length-1];
+                System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
                 misplacedData.clear();
-                recievedMessageData.add(received.getPayload());
+                recievedMessageData.add(midStep);
                 lastSequenceProcessed = received.getSequenceNumber();
                 return null;
             } else if (received.getPayload()[0] == NO_MORE_DATA_TO_COME){//this is the last packet of a sequence of data
@@ -392,7 +394,7 @@ public class TCPStream {
             }
 
 
-        } else if (received.getPort()==3){
+        } else if (received.getPort()==3) {
 
             ackGetter.recievedMSG(received.getSequenceNumber());
             System.out.println("Data message recieved.\n\n");
@@ -444,12 +446,12 @@ public class TCPStream {
         } else if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
             if (received.getFlags()== 1){ //SYN
                 connectionEstablished = true;
-                return new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
 
             } else if (received.getFlags() == 3){ //SYN/ACK
                 connectionEstablished = true;
 
-                return new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
 
             }
         } else if (received.getPort() == 6){//Ack-only message

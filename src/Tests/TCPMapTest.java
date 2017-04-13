@@ -1,4 +1,6 @@
-package TCPLayer;
+package Tests;
+
+import TCPLayer.*;
 
 import java.util.LinkedList;
 
