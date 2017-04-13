@@ -12,7 +12,8 @@ public class View implements Runnable {
 	private Scanner in = new Scanner(System.in);
 	private AddressMap map;
 
-	public View() {
+	public View(AddressMap map) {
+		this.map = map;
 		//new GUI().run();
 		System.out.println("Please give your name");
 		name = in.nextLine();
