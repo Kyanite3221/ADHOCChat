@@ -47,8 +47,8 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 1}, "OldShittyPc");
-		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 2}, "BetterLaptop");
+		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 1}, "OldPC___");
+		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 2}, "GoodPC__");
 
 		view = new View(addressMap);
 		String name = view.getName();
@@ -134,7 +134,7 @@ public class Controller {
 						System.out.println(Arrays.toString(ipMessage));
 						System.out.println(Arrays.toString(message.getPayload()));
 
-						//linkLayer.send(ipMessage);
+						linkLayer.send(ipMessage);
 						iter.remove();
 					}
 				}
