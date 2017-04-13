@@ -7,9 +7,18 @@ import java.util.*;
  */
 public class AddressMap {
     public HashMap<byte[], String> ipNameTable = new HashMap<>();
+    private int count = 1;
+    private final String FIXED = "Unknown Name ";
 
     public void setIpNameTable(byte[] ipaddress, String name) {
         ipNameTable.put(ipaddress,name);
+    }
+    
+    public void setIpNameTable(byte[] ipaddress) {
+        if(!ipNameTable.containsKey(ipaddress)) {
+        	ipNameTable.put(ipaddress, FIXED + count);
+        	count++;
+        }
     }
 
     public boolean checkName (String name) {
