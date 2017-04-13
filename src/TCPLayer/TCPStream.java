@@ -277,6 +277,7 @@ public class TCPStream {
 
         if (!connectionEstablished){
             if (connectionTimeOut < 1){
+                connectionTimeOut = TIMEOUT;
                 LinkedList<TCPMessage> returnAble = new LinkedList<TCPMessage>();
                 returnAble.add(new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null));
                 return returnAble;
@@ -330,12 +331,6 @@ public class TCPStream {
     public TCPMessage recievedMessage(@NotNull byte[] networkInfo){
         TCPMessage received = new TCPMessage(networkInfo);//data is converted into a sensible data format.
 
-        int recievedHash = hashData(received.getPayload());
-        if (recievedHash != received.getDataHash()){
-            System.out.println("\n!!!!WRONG HASH DATA!!!!\n");
-            return null;
-        }
-
 
 
         if (sequenceToTCP.containsKey(received.getAcknowledgeNumber())){ //if the acknowledgement number is one for a message that we sent,
@@ -345,7 +340,25 @@ public class TCPStream {
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
         }
         // make sure that we ack the next message if it was a regular message to be Ack'ed
-        if (received.getPort()==2){
+        if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
+            if (received.getFlags()== 1){ //SYN
+                connectionEstablished = true;
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
+
+            } else if (received.getFlags() == 3){ //SYN/ACK
+                connectionEstablished = true;
+
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
+
+            }
+        } else if (received.getPort() == 6){//Ack-only message
+            sequenceGetter.recieveAck(received.getAcknowledgeNumber());
+        }
+        int recievedHash = hashData(received.getPayload());
+        if (recievedHash != received.getDataHash()){
+            System.out.println("\n!!!!WRONG HASH DATA!!!!\n");
+            return null;
+        } else if (received.getPort()==2){
 
             ackGetter.recievedMSG(received.getSequenceNumber());
             System.out.println("Data message recieved.\n\n");
@@ -443,19 +456,6 @@ public class TCPStream {
             }
 
 
-        } else if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
-            if (received.getFlags()== 1){ //SYN
-                connectionEstablished = true;
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
-
-            } else if (received.getFlags() == 3){ //SYN/ACK
-                connectionEstablished = true;
-
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
-
-            }
-        } else if (received.getPort() == 6){//Ack-only message
-            sequenceGetter.recieveAck(received.getAcknowledgeNumber());
         } else if (received.getPort() == 0) {
             return received;
         }
@@ -464,6 +464,7 @@ public class TCPStream {
 
     public TCPMessage establishConnection(){
         connectionEstablished = false;
+        connectionTimeOut = 0;
         return new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null);
     }
 

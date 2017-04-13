@@ -29,14 +29,13 @@ public class TCPLayer {
         tcpMap.get("Broadcast").createPingMessage(tableInformation);
     }
 
-    public TCPMessage createMessageData(@NotNull byte[] data, String receiver){
+    public void createMessageData(@NotNull byte[] data, String receiver){
         if (tcpMap.containsKey(receiver)){
             tcpMap.get(receiver).createMessageData(data);
-            return null;
         } else {
             tcpMap.put(receiver, new TCPStream(receiver));
             tcpMap.get(receiver).createMessageData(data);
-            return tcpMap.get(receiver).establishConnection();
+            tcpMap.get(receiver).establishConnection();
         }
     }
 

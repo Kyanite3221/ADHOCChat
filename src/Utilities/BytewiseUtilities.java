@@ -34,11 +34,10 @@ public class BytewiseUtilities {
     }
 
     public static final int byteArrayToInt(byte[] bytes){
-        int result = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            result += bytes[i]*Math.pow(8,3-i);
-        }
-        return result;
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.put(bytes);
+        buffer.flip();
+        return buffer.getInt();
     }
 
     public static final long byteArrayToLong(byte[] bytes){

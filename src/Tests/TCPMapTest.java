@@ -52,9 +52,12 @@ public class TCPMapTest {
     }
 
     public static void initialContact (TCPLayer one, TCPLayer two) {
-        TCPMessage communicationChannel = one.connectToNewHost("two");
-        communicationChannel = two.recievedMessage(communicationChannel.toByte(), "one");
-        communicationChannel = one.recievedMessage(communicationChannel.toByte(), "two");
+        one.connectToNewHost("two");
+        TCPMessage communicationChannel = one.tick("two").getFirst();
+        two.recievedMessage(communicationChannel.toByte(), "one");
+        communicationChannel = two.tick("one").getFirst();
+        one.recievedMessage(communicationChannel.toByte(), "two");
+        communicationChannel = one.tick("two").getFirst();
     }
 
     public static void testPriorityHierarchy(){
