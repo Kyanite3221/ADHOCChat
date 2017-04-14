@@ -365,6 +365,7 @@ public class TCPStream {
 
             if (received.getPayload()[0]==SELF_CONTAINED_DATA_MESSAGE){//the message that just came in is not part of a larger amount of data
                 return received; //and can thus be forwarded to the controller
+
             } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data
                 recievedMessageData.clear(); //so a record needs to be kept of the order of this data.
                 byte[] midStep = new byte[received.getPayload().length-1];
@@ -373,6 +374,7 @@ public class TCPStream {
                 recievedMessageData.add(midStep);
                 lastSequenceProcessed = received.getSequenceNumber();
                 return null;
+
             } else if (received.getPayload()[0] == NO_MORE_DATA_TO_COME){//this is the last packet of a sequence of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
@@ -390,6 +392,7 @@ public class TCPStream {
                     }
                 }
                 return new TCPMessage(received.getSequenceNumber(), received.getAcknowledgeNumber(), received.getTimeStamp(), 0, received.getPort(), received.getFlags(), midStep);
+
             } else if (lastSequenceProcessed + 1 == received.getSequenceNumber()){ //the message is part of a larger ammount of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
@@ -414,6 +417,7 @@ public class TCPStream {
 
             if (received.getPayload()[0]==SELF_CONTAINED_DATA_MESSAGE){//the message that just came in is not part of a larger amount of data
                 return received; //and can thus be forwarded to the controller
+
             } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data
                 recievedFileData.clear(); //so a record needs to be kept of the order of this data.
                 byte[] midStep = new byte[received.getPayload().length-1];
@@ -422,6 +426,7 @@ public class TCPStream {
                 misplacedData.clear();
                 lastSequenceProcessed = received.getSequenceNumber();
                 return null;
+
             } else if (received.getPayload()[0] == NO_MORE_DATA_TO_COME){//this is the last packet of a sequence of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);
@@ -437,8 +442,9 @@ public class TCPStream {
                         midStep[counter] = byt;
                         counter++;
                     }
-                }
+                } //so the entire amount of data should be forwarded.
                 return new TCPMessage(received.getSequenceNumber(), received.getAcknowledgeNumber(), received.getTimeStamp(), 0, received.getPort(), received.getFlags(), midStep);
+
             } else if (lastSequenceProcessed + 1 == received.getSequenceNumber()){ //the message is part of a larger ammount of data
                 byte[] midStep = new byte[received.getPayload().length-1];
                 System.arraycopy(received.getPayload(), 1, midStep, 0, midStep.length);

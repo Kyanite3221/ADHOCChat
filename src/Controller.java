@@ -29,7 +29,7 @@ public class Controller {
 
 	private static LinkLayer linkLayer;
 	private static IPLayer ipLayer;
-	private static TCPLayer tcpLayer;
+	private static TCPLayer tCPLayer;
 	private static View view;
 
 	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
@@ -42,7 +42,7 @@ public class Controller {
 			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
 			linkLayer = new LinkLayer(inetAddress, DUMMY_PORT);
 			ipLayer = new IPLayer();
-			tcpLayer = new TCPLayer();
+			tCPLayer = new TCPLayer();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -84,7 +84,7 @@ public class Controller {
 					break;
 				case DELIVER:
 					byte[] payloadArray = ipLayer.removeHeader(incoming);
-					TCPMessage tcpMessage = tcpLayer.recievedMessage(payloadArray, sourceString);
+					TCPMessage tcpMessage = tCPLayer.recievedMessage(payloadArray, sourceString);
 
 					if (tcpMessage != null) {
 						addressMap.setIpNameTable(ipLayer.getSource(incoming));
@@ -108,34 +108,38 @@ public class Controller {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
 			System.out.println(message.toString());
-			tcpLayer.createMessageData(messageBytes, message.getIp());
+			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
 
 	public static void sendFromTCPLayer() {
-		List<TCPMessage> broadcastList = tcpLayer.tick();
-		for (TCPMessage message : broadcastList) {
+		List<TCPMessage> broadcastList = tCPLayer.tick();
+		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
 			linkLayer.send(ipMessage);
 		}
 
-		HashMap<String, LinkedList<TCPMessage>> list = tcpLayer.allTick();
+		HashMap<String, LinkedList<TCPMessage>> list = tCPLayer.allTick();
 		if (list != null) {
 			for (Map.Entry<String, LinkedList<TCPMessage>> pair : list.entrySet()) {
 				if (pair.getValue() != null) {
-					Iterator<TCPMessage> iter = pair.getValue().iterator();
+//					Iterator<TCPMessage> iter = pair.getValue().iterator();
+//
+//					while (iter.hasNext()) {
+//						TCPMessage message = iter.next();
+//						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
+//						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
+//
+//						//If there was a TCPMessage, it would be printed here
+//						System.out.println(Arrays.toString(ipMessage));
+//						System.out.println(Arrays.toString(message.getPayload()));
+//
+//						//linkLayer.send(ipMessage);
+//						iter.remove();
+//					}
 
-					while (iter.hasNext()) {
-						TCPMessage message = iter.next();
-						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
-						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
-
-						//If there was a TCPMessage, it would be printed here
-						System.out.println(Arrays.toString(ipMessage));
-						System.out.println(Arrays.toString(message.getPayload()));
-
-						//linkLayer.send(ipMessage);
-						iter.remove();
+					for(TCPMessage message : pair.getValue()){
+						System.out.println(message);
 					}
 				}
 			}
