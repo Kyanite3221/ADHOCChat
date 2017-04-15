@@ -14,7 +14,7 @@ public class RoutingProtocol {
     public RoutingProtocol (String myname, byte[] myAddress){
         this.myname = myname;
         this.myAddress = myAddress;
-        this.ownLocation = new MyRoute(myAddress,myAddress,0,"name");
+        this.ownLocation = new MyRoute(myAddress,myAddress,0, myname);
         forwardingTable.put(myAddress, ownLocation);
     }
 
@@ -32,21 +32,22 @@ public class RoutingProtocol {
 
     public byte[] send() {
         List<Byte> packetlist = new ArrayList<>();
-        for (int i = 0; i < forwardingTable.size(); i++) {
+        for (MyRoute route: forwardingTable.values()) {
             for (int j = 0; j < 4; j++) {
-                packetlist.add(forwardingTable.get(i).getDestination()[j]);
+                packetlist.add(route.getDestination()[j]);
             }
             for (int k = 0; k < 4; k++) {
-                packetlist.add(forwardingTable.get(i).getNexthop()[k]);
+                packetlist.add(route.getNexthop()[k]);
             }
-            packetlist.add(forwardingTable.get(i).getCostAsByte());
+            packetlist.add(route.getCostAsByte());
             for (int l = 0; l < 8; l++) {
-                packetlist.add(forwardingTable.get(i).getNameAsByte()[l]);
+                packetlist.add(route.getNameAsByte()[l]);
             }
         }
         byte[] packet = new byte[packetlist.size()];
         Byte[] rpacket = new Byte[packetlist.size()];
         rpacket = (Byte[]) packetlist.toArray();
+        System.out.println("hey now");
         packet = toPrimitivesbytes(rpacket);
         return packet;
     }

@@ -1,4 +1,5 @@
 import IPLayer.IPLayer;
+import Routing.RoutingProtocol;
 import TCPLayer.TCPLayer;
 import View.View;
 import View.Message;
@@ -7,6 +8,7 @@ import TCPLayer.TCPMessage;
 import IPLayer.AddressMap;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -24,12 +26,15 @@ public class Controller {
 			(byte) 0,
 			(byte) 0};
 
+	private static int PC_NUMBER;
+
 	private static final int DUMMY_PORT = 3000;
 	private static final int IP_HEADER_LENGTH = 16;
 
 	private static LinkLayer linkLayer;
 	private static IPLayer ipLayer;
 	private static TCPLayer tCPLayer;
+	private static RoutingProtocol routing;
 	private static View view;
 
 	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
@@ -37,12 +42,18 @@ public class Controller {
 	private static AddressMap addressMap;
 
 	public static void main(String[] args) {
+		PC_NUMBER = Integer.parseInt(args[0]);
+
+		byte[] myIP = IPLayer.ipStringToByteArray(ADHOC_ADDRESS);
+		myIP[3] = (byte) PC_NUMBER;
+
 		addressMap = new AddressMap();
 		try {
 			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
 			linkLayer = new LinkLayer(inetAddress, DUMMY_PORT);
-			ipLayer = new IPLayer();
+			ipLayer = new IPLayer(myIP);
 			tCPLayer = new TCPLayer();
+			routing = new RoutingProtocol("dumyName", myIP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -61,10 +72,22 @@ public class Controller {
 //		}
 
 		timer.scheduleAtFixedRate(() -> {
+
 			receiveFromLinkLayer();
 			sendFromApplicationLayer();
 			sendFromTCPLayer();
 		}, 0, 10, TimeUnit.MILLISECONDS);
+
+		timer.scheduleAtFixedRate(() -> {
+			sendPing();
+		}, 0, 1000, TimeUnit.MILLISECONDS);
+	}
+
+	private static void sendPing() {
+		System.out.println("ping");
+		byte[] routingPacket = routing.send();
+		System.out.println("ping2");
+		tCPLayer.createPingMessage(routingPacket);
 	}
 
 	public static void receiveFromLinkLayer() {
@@ -139,7 +162,9 @@ public class Controller {
 //					}
 
 					for(TCPMessage message : pair.getValue()){
-						System.out.println(message);
+						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
+						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
+
 					}
 				}
 			}

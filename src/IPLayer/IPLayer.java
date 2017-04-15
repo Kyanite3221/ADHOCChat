@@ -16,6 +16,12 @@ public class IPLayer {
 	public static final int MAX_PACKET_SIZE = 2;
 	private static final short TTL = 5;
 
+	private byte[] ownIP;
+
+	public IPLayer(byte[] ownIP) {
+
+	}
+
 	/**
 	 * bytes 0-1: 	payload length
 	 * byte 2:		header length
@@ -34,26 +40,27 @@ public class IPLayer {
 
 		//nexthop
 		System.arraycopy(destination, 0, dataWithIPHeader, 8, 4);
-		System.arraycopy(ipStringToByteArray(getOwnIP()), 0, dataWithIPHeader, 12, 4);
+		System.arraycopy(getOwnIPAsString(), 0, dataWithIPHeader, 12, 4);
 
 		System.arraycopy(tcpData, 0, dataWithIPHeader, 16, tcpData.length);
 
 		return dataWithIPHeader;
 	}
 
-	public String getOwnIP() {
-		try {
-			return InetAddress.getLocalHost().getHostAddress().toString();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public String getOwnIPAsString() {
+		return ipByteArrayToString(ownIP);
+	}
+
+	public byte[] getOwnIPAsByteArray() {
+		return ownIP;
 	}
 
 	public static byte[] ipStringToByteArray(String inet) {
+		System.out.println(inet);
 		String[] strings = inet.split(Pattern.quote("."));
 		byte[] bytes = new byte[strings.length];
 		for (int i = 0; i < strings.length; i++) {
+			System.out.println(strings[i]);
 			bytes[i] = (byte) Integer.parseInt(strings[i]);
 		}
 		return bytes;
@@ -71,26 +78,13 @@ public class IPLayer {
 	}
 
 	public boolean isOwnIP(byte[] address) {
-		byte[] ownIp = ipStringToByteArray(getOwnIP());
 		boolean differenceFound = false;
 		for (int i = 0; i < 4; i++) {
-			if (address[i] != ownIp[i]) {
+			if (address[i] != ownIP[i]) {
 				differenceFound = true;
 			}
 		}
 		return !differenceFound;
-	}
-
-	public static String getIPByteArrayAsString(byte[] incoming) {
-		String ip = "";
-		for (int i = 0; i < 4; i++) {
-			int ipByte = incoming[12 + i];
-			ip += ipByte;
-			if (i < 3) {
-				ip += ".";
-			}
-		}
-		return ip;
 	}
 
 	public enum IPDecision {
@@ -123,7 +117,7 @@ public class IPLayer {
 
 		//byte[] nextHop = routingData.getNextHop(destinationString);
 		byte[] destination = ipStringToByteArray(destinationString);
-		byte[] source = ipStringToByteArray(getOwnIP());
+		byte[] source = ownIP;
 
 		byte[] packetWithIPHeader = new byte[payloadLength + headerSize];
 		packetWithIPHeader[0] = (byte) (payloadLength / 256);

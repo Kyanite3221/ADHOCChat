@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import IPLayer.AddressMap;
+import IPLayer.IPLayer;
 
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
@@ -61,7 +62,7 @@ public class View implements Runnable {
 					case "/CONNECT":
 						System.out.println("Give the name of the person to contact");
 						ip = in.nextLine();
-						ip = (map.checkName(ip)) ? Arrays.toString(map.getIpaddress(ip)): "";
+						ip = (map.checkName(ip)) ? IPLayer.ipByteArrayToString(map.getIpaddress(ip)): "";
 						break;
 					case "/EXIT":
 						System.out.println("Leaving chat");
