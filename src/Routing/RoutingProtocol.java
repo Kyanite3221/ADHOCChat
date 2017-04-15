@@ -46,9 +46,8 @@ public class RoutingProtocol {
         }
         byte[] packet = new byte[packetlist.size()];
         Byte[] rpacket = new Byte[packetlist.size()];
-        rpacket = (Byte[]) packetlist.toArray();
-        System.out.println("hey now");
-        packet = toPrimitivesbytes(rpacket);
+        Object[] objectPacket = packetlist.toArray();
+        packet = toPrimitivesbytes(objectPacket);
         return packet;
     }
 
@@ -72,10 +71,11 @@ public class RoutingProtocol {
     }
 
 
-    public byte[] toPrimitivesbytes (Byte[] rbytes) {
+    public byte[] toPrimitivesbytes (Object[] rbytes) {
         byte[] bytes = new byte[rbytes.length];
         for(int i = 0;i < rbytes.length; i++) {
-            bytes[i] = rbytes[i];
+            Byte b = (Byte) rbytes[i];
+            bytes[i] = b;
         }
         return bytes;
     }

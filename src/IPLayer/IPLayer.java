@@ -56,11 +56,9 @@ public class IPLayer {
 	}
 
 	public static byte[] ipStringToByteArray(String inet) {
-		System.out.println(inet);
 		String[] strings = inet.split(Pattern.quote("."));
 		byte[] bytes = new byte[strings.length];
 		for (int i = 0; i < strings.length; i++) {
-			System.out.println(strings[i]);
 			bytes[i] = (byte) Integer.parseInt(strings[i]);
 		}
 		return bytes;

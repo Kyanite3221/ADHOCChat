@@ -233,6 +233,7 @@ public class TCPStream {
      */
     public void createPingMessage(byte[] tableInformation){ //works with any amount of messageData, but the tables shoudln't
                                                         // be too large, as it will all be fitted into a single packet
+        //TODO: add priorityMessage to queue
         priorityMessage = new TCPMessage( 0,0,0, hashData(tableInformation), (byte)0x00, ROUTING_FLAG , tableInformation);
     }
 

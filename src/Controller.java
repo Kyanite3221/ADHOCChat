@@ -84,9 +84,7 @@ public class Controller {
 	}
 
 	private static void sendPing() {
-		System.out.println("ping");
 		byte[] routingPacket = routing.send();
-		System.out.println("ping2");
 		tCPLayer.createPingMessage(routingPacket);
 	}
 
@@ -130,7 +128,7 @@ public class Controller {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
-			System.out.println(message.toString());
+			//System.out.println(message.toString());
 			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
@@ -139,6 +137,7 @@ public class Controller {
 		List<TCPMessage> broadcastList = tCPLayer.tick();
 		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
+			System.out.println(ipMessage);
 			linkLayer.send(ipMessage);
 		}
 
