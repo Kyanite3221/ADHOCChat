@@ -41,7 +41,7 @@ public class IPLayer {
 
 		//nexthop
 		System.arraycopy(destination, 0, dataWithIPHeader, 8, 4);
-
+		System.arraycopy(getOwnIPAsByteArray(), 0, dataWithIPHeader, 12, 4);
 
 		System.arraycopy(tcpData, 0, dataWithIPHeader, 16, tcpData.length);
 
