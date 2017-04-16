@@ -137,8 +137,8 @@ public class Controller {
 		List<TCPMessage> broadcastList = tCPLayer.tick();
 		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
-			System.out.println(ipMessage);
-			linkLayer.send(ipMessage);
+			System.out.println(Arrays.toString(ipMessage));
+			//linkLayer.send(ipMessage);
 		}
 
 		HashMap<String, LinkedList<TCPMessage>> list = tCPLayer.allTick();

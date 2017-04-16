@@ -19,7 +19,7 @@ public class IPLayer {
 	private byte[] ownIP;
 
 	public IPLayer(byte[] ownIP) {
-
+		this.ownIP = ownIP;
 	}
 
 	/**
@@ -38,9 +38,10 @@ public class IPLayer {
 		dataWithIPHeader[2] = (byte) HEADER_SIZE;
 		dataWithIPHeader[3] = (byte) TTL;
 
+
 		//nexthop
 		System.arraycopy(destination, 0, dataWithIPHeader, 8, 4);
-		System.arraycopy(getOwnIPAsString(), 0, dataWithIPHeader, 12, 4);
+		System.arraycopy(getOwnIPAsByteArray(), 0, dataWithIPHeader, 12, 4);
 
 		System.arraycopy(tcpData, 0, dataWithIPHeader, 16, tcpData.length);
 
