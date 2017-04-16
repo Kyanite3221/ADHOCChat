@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class Controller {
 	private static final String ADHOC_ADDRESS = "192.168.5.0";
 	private static final byte[] ADHOC_GROUP = new byte[] {
-			(byte) 228,
+			(byte) 224,
 			(byte) 0,
 			(byte) 0,
 			(byte) 0};
@@ -138,7 +138,7 @@ public class Controller {
 		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
 			System.out.println(Arrays.toString(ipMessage));
-			//linkLayer.send(ipMessage);
+			linkLayer.send(ipMessage);
 		}
 
 		HashMap<String, LinkedList<TCPMessage>> list = tCPLayer.allTick();
