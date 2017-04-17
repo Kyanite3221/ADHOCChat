@@ -6,17 +6,17 @@ import java.util.*;
  * Created by Georg on 10-Apr-17.
  */
 public class AddressMap {
-    public HashMap<byte[], String> ipNameTable = new HashMap<>();
+    public HashMap<String, String> ipNameTable = new HashMap<>();
     private int count = 1;
     private final String FIXED = "Unknown Name ";
 
     public void setIpNameTable(byte[] ipaddress, String name) {
-        ipNameTable.put(ipaddress,name);
+        ipNameTable.put(IPLayer.ipByteArrayToString(ipaddress),name);
     }
     
     public void setIpNameTable(byte[] ipaddress) {
         if(!ipNameTable.containsKey(ipaddress)) {
-        	ipNameTable.put(ipaddress, FIXED + count);
+        	ipNameTable.put(IPLayer.ipByteArrayToString(ipaddress), FIXED + count);
         	count++;
         }
     }
@@ -26,9 +26,9 @@ public class AddressMap {
     }
 
     public byte[] getIpaddress(String name) {
-        for (Map.Entry<byte[],String> entry: ipNameTable.entrySet()) {
+        for (Map.Entry<String,String> entry: ipNameTable.entrySet()) {
             if (Objects.equals(entry.getValue(),name)) {
-                return entry.getKey();
+                return IPLayer.ipStringToByteArray(entry.getKey());
             }
         }
         return null;
@@ -42,7 +42,7 @@ public class AddressMap {
         return ipNameTable.values();
     }
 
-    public Collection<byte[]> allIPAddresses() {
+    public Collection<String> allIPAddresses() {
         return ipNameTable.keySet();
     }
 }

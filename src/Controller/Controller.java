@@ -109,10 +109,12 @@ public class Controller {
 						switch (tcpMessage.getPort()) {
 							case 0:
 								routing.update(tcpMessage.getPayload(), source);
-
+								break;
 							case 2:
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(tcpMessage.getPayload()));
+								view.writeMessage(message);
+								break;
 							case 3:
 								//file share code
 						}
