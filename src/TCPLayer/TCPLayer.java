@@ -84,6 +84,40 @@ public class TCPLayer {
         return tcpMap.get("Broadcast").recievedMessage(networkInfo);
     }
 
+    public enum TCPNextAction{
+        SEND_TO_APLICATION,
+        SEND_TO_ROUTING,
+        NO_FURTHER_ACTION_THIS_CYCLE
+    }
+
+    public TCPNextAction handleIncomming(byte[] data) {
+        try{
+            byte port = data[20];
+            byte flag = data[21];
+            switch (port){
+                case 0x00:
+                    return TCPNextAction.SEND_TO_ROUTING;
+
+                case 0x01:
+                    return TCPNextAction.NO_FURTHER_ACTION_THIS_CYCLE;
+
+                case 0x02:
+                    return TCPNextAction.SEND_TO_APLICATION;
+
+                case 0x03:
+                    return TCPNextAction.SEND_TO_APLICATION;
+
+                case 0x06:
+                    return TCPNextAction.NO_FURTHER_ACTION_THIS_CYCLE;
+            }
+        } catch (ArrayIndexOutOfBoundsException e){
+            System.out.println("Not a proper byte representation of a TCP message");
+        } catch (NullPointerException ex){
+            System.out.println("argument was null");
+        }
+        return TCPNextAction.NO_FURTHER_ACTION_THIS_CYCLE;
+    }
+
 
 
 }

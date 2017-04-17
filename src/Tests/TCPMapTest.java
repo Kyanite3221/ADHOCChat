@@ -1,7 +1,6 @@
 package Tests;
 
 import TCPLayer.*;
-
 import java.util.LinkedList;
 
 /**
@@ -10,7 +9,7 @@ import java.util.LinkedList;
 public class TCPMapTest {
 
     public static void main(String[] args) {
-        testPriorityHierarchy();
+        pingTest();
     }
 
     private static void connectionSetup() {
@@ -107,5 +106,21 @@ public class TCPMapTest {
                 hostOne.recievedMessage(msg.toByte(), "two");
             }
         }
+    }
+
+    public static void pingTest(){
+        TCPLayer one = new TCPLayer();
+        TCPLayer two = new TCPLayer();
+
+        byte[] bla = new byte[4];
+        bla[0] = 0x0b;
+        bla[1] = 0x0e;
+        bla[2] = 0x0e;
+        bla[3] = 0x0f;
+
+        one.createPingMessage(bla);
+        LinkedList<TCPMessage> msgs = one.tick();
+        TCPMessage data = two.recievedMessage(msgs.getFirst().toByte());
+        System.out.println(Utilities.BytewiseUtilities.printBytes(data.getPayload()));
     }
 }
