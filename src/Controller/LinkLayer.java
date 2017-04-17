@@ -21,7 +21,11 @@ public class LinkLayer {
 	private MulticastSocket socket;
 	private ScheduledExecutorService timer = Executors.newScheduledThreadPool(4);
 
+	private final InetAddress group;
+
 	public LinkLayer(InetAddress adhocGroup, int port) throws IOException {
+		this.group = adhocGroup;
+
 		socket = new MulticastSocket(port);
 		socket.joinGroup(adhocGroup);
 
@@ -69,8 +73,9 @@ public class LinkLayer {
 	}
 
 	public void send(byte[] bytesToSend) {
-		DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length);
 		try {
+
+			DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length, group, 3000);
 			packet.setAddress(InetAddress.getByName("192.168.5.0"));
 			System.out.println("sending");
 			socket.send(packet);

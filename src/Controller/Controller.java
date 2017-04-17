@@ -29,7 +29,6 @@ public class Controller {
 	private static int PC_NUMBER;
 
 	private static final int DUMMY_PORT = 3000;
-	private static final int IP_HEADER_LENGTH = 16;
 
 	private static LinkLayer linkLayer;
 	private static IPLayer ipLayer;
@@ -85,6 +84,8 @@ public class Controller {
 		byte[] incoming = linkLayer.receive();
 
 		if (incoming != null) {
+			System.out.println("package received!");
+
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
