@@ -89,6 +89,8 @@ public class Controller {
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
+			System.out.println(Arrays.toString(source));
+
 			switch (ipLayer.handlePacket(incoming)) {
 				case IGNORE:
 					//this packet is not for us
@@ -103,9 +105,12 @@ public class Controller {
 
 					if (tcpMessage != null) {
 						addressMap.setIpNameTable(ipLayer.getSource(incoming));
+						System.out.println(tcpMessage.getPort());
 						switch (tcpMessage.getPort()) {
 							case 0:
 								routing.update(tcpMessage.getPayload(), source);
+								System.out.println(routing.toString());
+
 							case 2:
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(tcpMessage.getPayload()));

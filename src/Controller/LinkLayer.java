@@ -28,6 +28,9 @@ public class LinkLayer {
 
 		socket = new MulticastSocket(port);
 		socket.joinGroup(adhocGroup);
+		socket.setLoopbackMode(false);
+		System.out.println(socket.getLoopbackMode());
+		socket.setBroadcast(true);
 
 		Thread receiveLoopThread = new Thread(() -> {
 			while (true) {
@@ -51,6 +54,7 @@ public class LinkLayer {
 		System.arraycopy(ipBuffer, 0, data, 0, IP_HEADER_LENGTH);
 		System.arraycopy(payloadBuffer, 0, data, IP_HEADER_LENGTH, payload);
 
+		System.out.println("incoming packet added to linklayer queue");
 		inboundQueue.add(data);
 	}
 

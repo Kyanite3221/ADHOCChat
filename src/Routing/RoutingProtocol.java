@@ -79,4 +79,16 @@ public class RoutingProtocol {
         }
         return bytes;
     }
+
+    @Override
+    public String toString() {
+        String s = "";
+        s += "table: \n";
+        for (Map.Entry<byte[], MyRoute> entry : forwardingTable.entrySet()) {
+            s += Arrays.toString(entry.getKey());
+            s += ": ";
+            s += entry.getValue().toString();
+        }
+        return s;
+    }
 }
