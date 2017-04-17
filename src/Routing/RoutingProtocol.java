@@ -1,11 +1,13 @@
 package Routing;
 
+import IPLayer.IPLayer;
+
 import java.util.*;
 /**
  * Created by Georg on 11-Apr-17.
  */
 public class RoutingProtocol {
-    private HashMap<byte[], MyRoute> forwardingTable= new HashMap<>();
+    private HashMap<String, MyRoute> forwardingTable= new HashMap<>();
     private byte[] myAddress;
     private MyRoute ownLocation;
     private String myname;
@@ -15,17 +17,18 @@ public class RoutingProtocol {
         this.myname = myname;
         this.myAddress = myAddress;
         this.ownLocation = new MyRoute(myAddress,myAddress,0, myname);
-        forwardingTable.put(myAddress, ownLocation);
+        forwardingTable.put(IPLayer.ipByteArrayToString(myAddress), ownLocation);
     }
 
     public void update(byte[] data, byte[] source) {
         MyRoute[] processedData = readdata(data, source);
         for (int i = 0; i < processedData.length; i++){
-            if (!forwardingTable.containsKey(processedData[i].getDestination())) {
-                forwardingTable.put(processedData[i].getDestination(),processedData[i]);
+            String destination = IPLayer.ipByteArrayToString(processedData[i].getDestination());
+            if (!forwardingTable.containsKey(destination)) {
+                forwardingTable.put(destination,processedData[i]);
             }
-            if (forwardingTable.get(processedData[i].getDestination()).getCost() > processedData[i].getCost()) {
-                forwardingTable.replace(processedData[i].getDestination(),processedData[i]);
+            if (forwardingTable.get(destination).getCost() > processedData[i].getCost()) {
+                forwardingTable.replace(destination,processedData[i]);
             }
         }
     }
@@ -84,10 +87,11 @@ public class RoutingProtocol {
     public String toString() {
         String s = "";
         s += "table: \n";
-        for (Map.Entry<byte[], MyRoute> entry : forwardingTable.entrySet()) {
-            s += Arrays.toString(entry.getKey());
+        for (Map.Entry<String, MyRoute> entry : forwardingTable.entrySet()) {
+            s += entry.getKey();
             s += ": ";
             s += entry.getValue().toString();
+            s += "\n";
         }
         return s;
     }

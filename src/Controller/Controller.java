@@ -46,19 +46,20 @@ public class Controller {
 		byte[] myIP = IPLayer.ipStringToByteArray(ADHOC_ADDRESS);
 		myIP[3] = (byte) PC_NUMBER;
 
+		view = new View(addressMap);
+		String name = view.getName();
+
 		addressMap = new AddressMap();
 		try {
 			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
 			linkLayer = new LinkLayer(inetAddress, DUMMY_PORT);
 			ipLayer = new IPLayer(myIP);
 			tCPLayer = new TCPLayer();
-			routing = new RoutingProtocol("dumyName", myIP);
+			routing = new RoutingProtocol(name, myIP);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		view = new View(addressMap);
-		String name = view.getName();
 		addressMap.setIpNameTable(myIP, "name");
 
 		Thread viewThread = new Thread(view);

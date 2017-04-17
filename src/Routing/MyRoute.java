@@ -1,6 +1,8 @@
 package Routing;
 
 
+import java.util.Arrays;
+
 /**
  * Created by Georg on 11-Apr-17.
  */
@@ -62,4 +64,13 @@ public class MyRoute {
         return name.getBytes();
     }
 
+    @Override
+    public String toString() {
+        return "MyRoute{" +
+                "destination=" + Arrays.toString(destination) +
+                ", nexthop=" + Arrays.toString(nexthop) +
+                ", cost=" + cost +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
