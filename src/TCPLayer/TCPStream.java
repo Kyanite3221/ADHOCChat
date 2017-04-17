@@ -294,7 +294,7 @@ public class TCPStream {
 
         if (priorityMessage != null){
             toReturn.add(priorityMessage);
-            System.out.println("!!!! SENDING PRIORITY MESSAGE !!!!!");
+            //System.out.println("!!!! SENDING PRIORITY MESSAGE !!!!!");
             priorityMessage = null;
             return toReturn;
         }

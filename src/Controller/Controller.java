@@ -144,24 +144,10 @@ public class Controller {
 		if (list != null) {
 			for (Map.Entry<String, LinkedList<TCPMessage>> pair : list.entrySet()) {
 				if (pair.getValue() != null) {
-//					Iterator<TCPMessage> iter = pair.getValue().iterator();
-//
-//					while (iter.hasNext()) {
-//						TCPMessage message = iter.next();
-//						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
-//						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
-//
-//						//If there was a TCPMessage, it would be printed here
-//						System.out.println(Arrays.toString(ipMessage));
-//						System.out.println(Arrays.toString(message.getPayload()));
-//
-//						//linkLayer.send(ipMessage);
-//						iter.remove();
-//					}
-
 					for(TCPMessage message : pair.getValue()){
 						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
 						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
+						linkLayer.send(ipMessage);
 
 					}
 				}
