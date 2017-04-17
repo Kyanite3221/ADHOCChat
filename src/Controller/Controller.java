@@ -58,21 +58,14 @@ public class Controller {
 			e.printStackTrace();
 		}
 
-		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 1}, "OldPC___");
-		addressMap.setIpNameTable(new byte[] {(byte) 198, (byte) 168, (byte) 5, (byte) 2}, "GoodPC__");
-
 		view = new View(addressMap);
 		String name = view.getName();
+		addressMap.setIpNameTable(myIP, "name");
 
 		Thread viewThread = new Thread(view);
 		viewThread.start();
 
-//		for (byte[] address: addressMap.allIPAddresses()) {
-//
-//		}
-
 		timer.scheduleAtFixedRate(() -> {
-
 			receiveFromLinkLayer();
 			sendFromApplicationLayer();
 			sendFromTCPLayer();
@@ -111,7 +104,7 @@ public class Controller {
 						addressMap.setIpNameTable(ipLayer.getSource(incoming));
 						switch (tcpMessage.getPort()) {
 							case 0:
-								//routing code
+								routing.update(tcpMessage.getPayload(), source);
 							case 2:
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(tcpMessage.getPayload()));
