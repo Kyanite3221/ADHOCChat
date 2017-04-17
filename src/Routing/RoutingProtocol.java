@@ -37,7 +37,7 @@ public class RoutingProtocol {
                 packetlist.add(route.getDestination()[j]);
             }
             for (int k = 0; k < 4; k++) {
-                packetlist.add(route.getNexthop()[k]);
+                packetlist.add(myAddress[k]);
             }
             packetlist.add(route.getCostAsByte());
             for (int l = 0; l < 8; l++) {
