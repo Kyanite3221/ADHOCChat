@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class Controller {
 	private static final String ADHOC_ADDRESS = "192.168.5.0";
 	private static final byte[] ADHOC_GROUP = new byte[] {
-			(byte) 224,
+			(byte) 228,
 			(byte) 0,
 			(byte) 0,
 			(byte) 0};
