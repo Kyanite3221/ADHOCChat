@@ -1,6 +1,7 @@
 package Routing;
 
 import IPLayer.IPLayer;
+import IPLayer.AddressMap;
 
 import java.util.*;
 /**
@@ -9,15 +10,18 @@ import java.util.*;
 public class RoutingProtocol {
     private HashMap<String, MyRoute> forwardingTable= new HashMap<>();
     private byte[] myAddress;
+    private AddressMap addressMap;
     private MyRoute ownLocation;
     private String myname;
     private byte[] data;
 
-    public RoutingProtocol (String myname, byte[] myAddress){
+    public RoutingProtocol(String myname, byte[] myAddress, AddressMap addressMap){
         this.myname = myname;
         this.myAddress = myAddress;
+        this.addressMap = addressMap;
         this.ownLocation = new MyRoute(myAddress,myAddress,0, myname);
         forwardingTable.put(IPLayer.ipByteArrayToString(myAddress), ownLocation);
+        addressMap.setIpNameTable(myAddress, myname);
     }
 
     public void update(byte[] data, byte[] source) {
@@ -26,6 +30,7 @@ public class RoutingProtocol {
             String destination = IPLayer.ipByteArrayToString(processedData[i].getDestination());
             if (!forwardingTable.containsKey(destination)) {
                 forwardingTable.put(destination,processedData[i]);
+                addressMap.setIpNameTable(processedData[i].getDestination(), processedData[i].getName());
             }
             if (forwardingTable.get(destination).getCost() > processedData[i].getCost()) {
                 forwardingTable.replace(destination,processedData[i]);

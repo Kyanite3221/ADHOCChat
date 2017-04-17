@@ -30,8 +30,6 @@ public class LinkLayer {
 
 		socket = new MulticastSocket(port);
 		socket.joinGroup(adhocGroup);
-		socket.setLoopbackMode(false);
-		System.out.println(socket.getLoopbackMode());
 		socket.setBroadcast(true);
 
 		Thread receiveLoopThread = new Thread(() -> {
@@ -44,7 +42,6 @@ public class LinkLayer {
 
 	public void readPacketToQueue() {
 		byte[] ipBuffer = readBytes(1000);
-		System.out.println(Arrays.toString(ipBuffer));
 
 		int payload = ((ipBuffer[PAYLOAD_BYTE] + 256) % 256) * 256 + ((ipBuffer[PAYLOAD_BYTE + 1] + 256) % 256);
 		if (payload <= 0) {
