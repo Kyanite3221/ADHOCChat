@@ -110,8 +110,6 @@ public class IPLayer {
 		byte[] destination = Arrays.copyOfRange(packet, 8, 12);
 		byte[] sender = Arrays.copyOfRange(packet,12, 16);
 
-		System.out.println(Arrays.toString(sender));
-
 		if (isOwnIP(sender)) {
 			return IPDecision.IGNORE;
 		} else if (isOwnIP(destination) || isBroadcast(destination)) {

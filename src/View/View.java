@@ -24,7 +24,7 @@ public class View implements Runnable {
 			}
 		}
 		else {
-			name = name.substring(0, 7);
+			name = name.substring(0, 8);
 		}
 	}
 

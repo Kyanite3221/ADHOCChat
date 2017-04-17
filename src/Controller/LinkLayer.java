@@ -74,9 +74,7 @@ public class LinkLayer {
 
 			DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length, group, 3000);
 			packet.setAddress(InetAddress.getByName("192.168.5.0"));
-			System.out.println("sending");
 			socket.send(packet);
-			System.out.println("sent");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
