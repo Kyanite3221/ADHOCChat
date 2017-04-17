@@ -77,6 +77,7 @@ public class Controller {
 
 	private static void sendPing() {
 		byte[] routingPacket = routing.send();
+		System.out.println("routingpacket:"+Arrays.toString(routingPacket));
 		tCPLayer.createPingMessage(routingPacket);
 	}
 
@@ -84,12 +85,12 @@ public class Controller {
 		byte[] incoming = linkLayer.receive();
 
 		if (incoming != null) {
-			System.out.println("package received!");
+			System.out.println("package received!" + Arrays.toString(incoming));
 
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
-			System.out.println(Arrays.toString(source));
+			System.out.println(ipLayer.handlePacket(incoming));
 
 			switch (ipLayer.handlePacket(incoming)) {
 				case IGNORE:
@@ -101,7 +102,17 @@ public class Controller {
 					break;
 				case DELIVER:
 					byte[] payloadArray = ipLayer.removeHeader(incoming);
-					TCPMessage tcpMessage = tCPLayer.recievedMessage(payloadArray, sourceString);
+					System.out.println(Arrays.toString(payloadArray));
+
+
+					TCPMessage tcpMessage;
+					if (ipLayer.isBroadcast(ipLayer.getDestination(incoming))) {
+						tcpMessage = tCPLayer.recievedMessage(payloadArray);
+					} else {
+						tcpMessage = tCPLayer.recievedMessage(payloadArray, sourceString);
+					}
+
+					System.out.println(tcpMessage);
 
 					if (tcpMessage != null) {
 						addressMap.setIpNameTable(ipLayer.getSource(incoming));
@@ -135,8 +146,9 @@ public class Controller {
 	public static void sendFromTCPLayer() {
 		List<TCPMessage> broadcastList = tCPLayer.tick();
 		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
+			System.out.println("tcpd ping:"+Arrays.toString(message.toByte()));
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
-			System.out.println(Arrays.toString(ipMessage));
+			System.out.println("ipMessage:" +Arrays.toString(ipMessage));
 			linkLayer.send(ipMessage);
 		}
 

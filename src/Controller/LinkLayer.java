@@ -1,10 +1,12 @@
 package Controller;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.sql.Time;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.*;
 
@@ -41,21 +43,15 @@ public class LinkLayer {
 	}
 
 	public void readPacketToQueue() {
-		byte[] ipBuffer = readBytes(IP_HEADER_LENGTH);
+		byte[] ipBuffer = readBytes(1000);
+		System.out.println(Arrays.toString(ipBuffer));
 
-		int payload = ipBuffer[PAYLOAD_BYTE] * 256 + ipBuffer[PAYLOAD_BYTE + 1];
+		int payload = ((ipBuffer[PAYLOAD_BYTE] + 256) % 256) * 256 + ((ipBuffer[PAYLOAD_BYTE + 1] + 256) % 256);
 		if (payload <= 0) {
 			//handle no payload
 		}
 
-		byte[] payloadBuffer = readBytes(payload);
-
-		byte[] data = new byte[IP_HEADER_LENGTH + payload];
-		System.arraycopy(ipBuffer, 0, data, 0, IP_HEADER_LENGTH);
-		System.arraycopy(payloadBuffer, 0, data, IP_HEADER_LENGTH, payload);
-
-		System.out.println("incoming packet added to linklayer queue");
-		inboundQueue.add(data);
+		inboundQueue.add(Arrays.copyOfRange(ipBuffer, 0, IP_HEADER_LENGTH + payload));
 	}
 
 	public byte[] readBytes(int length) {

@@ -86,6 +86,19 @@ public class IPLayer {
 		return !differenceFound;
 	}
 
+	public boolean isBroadcast(byte[] address) {
+		boolean differenceFound = false;
+		for (int i = 0; i < 3; i++) {
+			if (address[i] != ownIP[i]) {
+				differenceFound = true;
+			}
+		}
+		if (address[3] != 0) {
+			differenceFound = true;
+		}
+		return !differenceFound;
+	}
+
 	public enum IPDecision {
 		IGNORE,
 		FORWARD,
@@ -95,8 +108,13 @@ public class IPLayer {
 	public IPDecision handlePacket(byte[] packet) {
 		byte[] nextHop = Arrays.copyOfRange(packet, 4, 8);
 		byte[] destination = Arrays.copyOfRange(packet, 8, 12);
+		byte[] sender = Arrays.copyOfRange(packet,12, 16);
 
-		if (isOwnIP(destination)) {
+		System.out.println(Arrays.toString(sender));
+
+		if (isOwnIP(sender)) {
+			return IPDecision.IGNORE;
+		} else if (isOwnIP(destination) || isBroadcast(destination)) {
 			return IPDecision.DELIVER;
 		} else if (isOwnIP(nextHop)) {
 			return IPDecision.FORWARD;
@@ -135,5 +153,9 @@ public class IPLayer {
 
 	public byte[] getSource(byte[] packet) {
 		return Arrays.copyOfRange(packet, 12, 16);
+	}
+
+	public byte[] getDestination(byte[] packet) {
+		return Arrays.copyOfRange(packet, 8, 12);
 	}
 }
