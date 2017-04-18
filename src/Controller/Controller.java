@@ -87,14 +87,16 @@ public class Controller {
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
-			System.out.println(ipLayer.handlePacket(incoming));
 			switch (ipLayer.handlePacket(incoming)) {
 				case IGNORE:
 					//this packet is not for us
 					break;
 				case FORWARD:
 					//this packet is not for us, but we can forward it
+					System.out.println("we are forwarding the following packet");
+					System.out.println(Arrays.toString(incoming));
 					ipLayer.forward(incoming);
+					System.out.println(Arrays.toString(incoming));
 					linkLayer.send(incoming);
 					break;
 				case DELIVER:

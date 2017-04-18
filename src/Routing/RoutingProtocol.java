@@ -102,7 +102,6 @@ public class RoutingProtocol {
     }
     public byte[] getnhop(String ip) {
         if (! ip.equals("-64.-88.5.0")) {
-            System.out.println(Arrays.toString(forwardingTable.get(ip).getNexthop()));
         }
 
         if (forwardingTable.containsKey(ip)){
