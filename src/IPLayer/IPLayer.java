@@ -132,6 +132,13 @@ public class IPLayer {
 		return Arrays.copyOfRange(packet, HEADER_SIZE, packet.length);
 	}
 
+	public void forward(byte[] packet) {
+		byte[] destination = getDestination(packet);
+		byte[] nextHop = routing.getnhop(IPLayer.ipByteArrayToString(destination));
+		System.arraycopy(nextHop, 0, packet, 4, 4);
+
+	}
+
 	public byte[] addHeader(byte[] packet, String destinationString) {
 		int payloadLength = packet.length;
 		short headerSize = HEADER_SIZE;
