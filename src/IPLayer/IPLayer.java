@@ -1,6 +1,8 @@
 package IPLayer;
 
 
+import Routing.RoutingProtocol;
+
 import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,9 +19,11 @@ public class IPLayer {
 	private static final short TTL = 5;
 
 	private byte[] ownIP;
+	private RoutingProtocol routing;
 
-	public IPLayer(byte[] ownIP) {
+	public IPLayer(byte[] ownIP, RoutingProtocol routing) {
 		this.ownIP = ownIP;
+		this.routing = routing;
 	}
 
 	/**
@@ -39,7 +43,9 @@ public class IPLayer {
 		dataWithIPHeader[3] = (byte) TTL;
 
 
-		//nexthop
+		byte[] nextHop = routing.getnhop(ipByteArrayToString(destination));
+
+		System.arraycopy(nextHop, 0, dataWithIPHeader, 4, 4);
 		System.arraycopy(destination, 0, dataWithIPHeader, 8, 4);
 		System.arraycopy(getOwnIPAsByteArray(), 0, dataWithIPHeader, 12, 4);
 
@@ -97,6 +103,10 @@ public class IPLayer {
 			differenceFound = true;
 		}
 		return !differenceFound;
+	}
+
+	public byte[] forward(byte[] incoming) {
+
 	}
 
 	public enum IPDecision {

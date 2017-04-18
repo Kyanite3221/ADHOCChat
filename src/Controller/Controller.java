@@ -53,9 +53,9 @@ public class Controller {
 		try {
 			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
 			linkLayer = new LinkLayer(inetAddress, DUMMY_PORT);
-			ipLayer = new IPLayer(myIP);
 			tCPLayer = new TCPLayer();
 			routing = new RoutingProtocol(name, myIP, addressMap);
+			ipLayer = new IPLayer(myIP, routing);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,7 +93,9 @@ public class Controller {
 					break;
 				case FORWARD:
 					//this packet is not for us, but we can forward it
-					//iplayer.forward SOMEHOW
+					String destination = IPLayer.ipByteArrayToString(ipLayer.getDestination(incoming));
+					byte[] forwardPacket = ipLayer.addHeader(ipLayer.removeHeader(incoming), destination);
+					linkLayer.send(forwardPacket);
 					break;
 				case DELIVER:
 					byte[] payloadArray = ipLayer.removeHeader(incoming);
@@ -150,7 +152,6 @@ public class Controller {
 						byte[] ipAddress = IPLayer.ipStringToByteArray(pair.getKey());
 						byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), ipAddress);
 						linkLayer.send(ipMessage);
-
 					}
 				}
 			}
