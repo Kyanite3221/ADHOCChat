@@ -44,8 +44,9 @@ public class IPLayer {
 
 
 		byte[] nextHop = routing.getnhop(ipByteArrayToString(destination));
-
-		System.arraycopy(nextHop, 0, dataWithIPHeader, 4, 4);
+		if (nextHop != null) {
+			System.arraycopy(nextHop, 0, dataWithIPHeader, 4, 4);
+		}
 		System.arraycopy(destination, 0, dataWithIPHeader, 8, 4);
 		System.arraycopy(getOwnIPAsByteArray(), 0, dataWithIPHeader, 12, 4);
 
