@@ -100,4 +100,11 @@ public class RoutingProtocol {
         }
         return s;
     }
+    public byte[] getnhop(String ip) {
+        if (forwardingTable.containsKey(ip)){
+            return forwardingTable.get(ip).getNexthop();
+        }
+        return null;
+    }
 }
+
