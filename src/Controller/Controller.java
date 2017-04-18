@@ -93,8 +93,7 @@ public class Controller {
 					break;
 				case FORWARD:
 					//this packet is not for us, but we can forward it
-					String destination = IPLayer.ipByteArrayToString(ipLayer.getDestination(incoming));
-					byte[] forwardPacket = ipLayer.addHeader(ipLayer.removeHeader(incoming), destination);
+					byte[] forwardPacket = ipLayer.addIPHeader(ipLayer.removeHeader(incoming), ipLayer.getDestination(incoming));
 					linkLayer.send(forwardPacket);
 					break;
 				case DELIVER:
