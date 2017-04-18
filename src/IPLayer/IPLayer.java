@@ -16,7 +16,7 @@ public class IPLayer {
 
 	public static final int HEADER_SIZE = 16;
 	public static final int MAX_PACKET_SIZE = 2;
-	private static final short TTL = 5;
+	private static final short TTL = 3;
 
 	private byte[] ownIP;
 	private RoutingProtocol routing;
@@ -117,15 +117,21 @@ public class IPLayer {
 		byte[] destination = Arrays.copyOfRange(packet, 8, 12);
 		byte[] sender = Arrays.copyOfRange(packet,12, 16);
 
-		if (isOwnIP(sender)) {
+		//System.out.println("we have recieved a packet with nexthop" + Arrays.toString(nextHop));
+
+		if (isOwnIP(sender) || getTTL(packet) <= 0) {
 			return IPDecision.IGNORE;
 		} else if (isOwnIP(destination) || isBroadcast(destination)) {
 			return IPDecision.DELIVER;
-		} else if (isOwnIP(nextHop)) {
-			return IPDecision.FORWARD;
+		//} else if (isOwnIP(nextHop)) {
+		//	return IPDecision.FORWARD;
 		} else {
-			return IPDecision.IGNORE;
+			return IPDecision.FORWARD;
 		}
+	}
+
+	private int getTTL(byte[] packet) {
+		return (int) packet[3];
 	}
 
 	public byte[] removeHeader(byte[] packet) {
@@ -135,6 +141,7 @@ public class IPLayer {
 	public void forward(byte[] packet) {
 		byte[] destination = getDestination(packet);
 		byte[] nextHop = routing.getnhop(IPLayer.ipByteArrayToString(destination));
+		packet[3] = (byte) (((int) packet[3]) -1);
 		System.arraycopy(nextHop, 0, packet, 4, 4);
 
 	}

@@ -87,7 +87,10 @@ public class Controller {
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
-			switch (ipLayer.handlePacket(incoming)) {
+			IPLayer.IPDecision decision = ipLayer.handlePacket(incoming);
+			//	System.out.println(decision);
+
+			switch (decision) {
 				case IGNORE:
 					//this packet is not for us
 					break;
