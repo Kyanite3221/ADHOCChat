@@ -105,10 +105,6 @@ public class IPLayer {
 		return !differenceFound;
 	}
 
-	public byte[] forward(byte[] incoming) {
-
-	}
-
 	public enum IPDecision {
 		IGNORE,
 		FORWARD,
