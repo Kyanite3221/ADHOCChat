@@ -46,7 +46,7 @@ public class View implements Runnable {
 	}
 	
 	public void addMessage(String receiver, String message) {
-		ip = (map.checkName(name)) ? IPLayer.ipByteArrayToString(map.getIpaddress(name)): "";
+		ip = (map.checkName(receiver)) ? IPLayer.ipByteArrayToString(map.getIpaddress(receiver)): "";
 		messageStack.add(new Message(ip, name, message));
 	}
 	
