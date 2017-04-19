@@ -54,7 +54,22 @@ public class Controller {
 
 		addressMap = new AddressMap();
 		view = new View(addressMap);
-		String name = view.getName();
+
+		String name = "";
+		while (name.length() != 8) {
+			name = view.getName();
+			logger.write(name);
+			if (name.length() == 8) {
+				break;
+			}
+		}
+
+		logger.close();
+		logger = new Logger();
+
+		System.out.println("name set");
+
+		System.out.println("name"+name);
 
 
 		try {
