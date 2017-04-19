@@ -8,11 +8,16 @@ import java.util.LinkedList;
 public class AcknowledgementStrategy {
 
     private LinkedList<Integer> acks;
+    private LinkedList<Integer> previousAcks;
     private boolean doubleSeq;
     public boolean trippleSeq;
 
     public AcknowledgementStrategy(){
         acks = new LinkedList<>();
+        previousAcks = new LinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            previousAcks.add(0);
+        }
         acks.add(0);
         doubleSeq = false;
         trippleSeq = false;
@@ -22,10 +27,12 @@ public class AcknowledgementStrategy {
     public int nextAck(){
         int toReturn = acks.getFirst();
         if (acks.size() > 1){
-            acks.removeFirst();
+            previousAcks.add(acks.removeFirst());
+            previousAcks.removeFirst();
         } else {
             acks.add(0);
-            acks.removeFirst();
+            previousAcks.add(acks.removeFirst());
+            previousAcks.removeFirst();
         }
         doubleSeq = false;
         trippleSeq = false;
@@ -50,6 +57,6 @@ public class AcknowledgementStrategy {
     }
 
     public boolean hasNotBeenRecievedBefore(int seq){
-        return (!acks.contains(seq));
+        return (!(acks.contains(seq)&&previousAcks.contains(seq)));
     }
 }
