@@ -358,7 +358,7 @@ public class TCPStream {
                 priorityMessage = new TCPMessage(0, ackGetter.nextAck(), System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, FIN_ACK_FLAG, null);
                 connectionTerminated = true;
             } else if (received.getFlags() == FIN_ACK_FLAG){
-
+                connectionTerminated = true;
             }
 
         } else if (received.getPort() == 6){//Ack-only message
@@ -500,8 +500,12 @@ public class TCPStream {
         return name;
     }
 
-    public TCPMessage terminateConnection(){
-        return new TCPMessage(sequenceGetter.getNextSeqNumber(1),ackGetter.nextAck(), System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, FIN_FLAG, null );
+    public void terminateConnection(){
+        priorityMessage = new TCPMessage(sequenceGetter.getNextSeqNumber(1),ackGetter.nextAck(), System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, FIN_FLAG, null );
+    }
+
+    public boolean isConnectionTerminated(){
+        return connectionTerminated;
     }
 
 
