@@ -33,7 +33,7 @@ public class EncryptionTest {
         moduleOne.recievedMessage(messageTwo, "two");// null, as there is no response from message2.
         System.out.println(moduleOne.isBufferEmpty());
         if (!moduleOne.isBufferEmpty()){
-            System.out.println(BytewiseUtilities.printBytes(moduleTwo.recievedMessage(moduleOne.encodeFirstBufferItem("two"),"one")));
+            System.out.println(BytewiseUtilities.printBytes(moduleTwo.recievedMessage(moduleOne.encodeFirstBufferItem().getMessage().getBytes(),"one")));
         }
         System.out.println(moduleOne.isBufferEmpty());
     }
