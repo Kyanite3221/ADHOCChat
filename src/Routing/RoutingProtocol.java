@@ -3,10 +3,8 @@ package Routing;
 import IPLayer.AddressMap;
 import IPLayer.IPLayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 /**
  * Created by Georg on 11-Apr-17.
  */
@@ -28,6 +26,7 @@ public class RoutingProtocol {
     }
 
     public void update(byte[] data, byte[] source) {
+
         MyRoute[] processedData = readdata(data, source);
         for (int i = 0; i < processedData.length; i++){
             String destination = IPLayer.ipByteArrayToString(processedData[i].getDestination());
@@ -37,6 +36,21 @@ public class RoutingProtocol {
             }
             if (forwardingTable.get(destination).getCost() > processedData[i].getCost()) {
                 forwardingTable.replace(destination,processedData[i]);
+            }
+        }
+    }
+
+    public void handleTTL() {
+        for (Map.Entry<String, MyRoute> entry : forwardingTable.entrySet()) {
+            if (entry.getValue().equals(Arrays.toString(myAddress))) {
+                continue;
+            }
+
+            entry.getValue().decrementTTL();
+            if (entry.getValue().hasExpired()) {
+                System.out.println("expired route: " + entry.getValue().getName());
+                forwardingTable.remove(entry.getKey());
+                addressMap.removeIP(Arrays.toString(entry.getValue().getDestination()));
             }
         }
     }

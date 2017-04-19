@@ -48,4 +48,9 @@ public class AddressMap {
     public Collection<String> allIPAddresses() {
         return ipNameTable.keySet();
     }
+
+    public void removeIP(String s) {
+        System.out.println("removing " + s);
+        ipNameTable.remove(s);
+    }
 }

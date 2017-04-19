@@ -74,6 +74,7 @@ public class Controller {
 		logger.write("Starting main loops");
 
 		timer.scheduleAtFixedRate(() -> {
+			routing.handleTTL();
 			receiveFromLinkLayer();
 			sendFromApplicationLayer();
 			sendFromTCPLayer();

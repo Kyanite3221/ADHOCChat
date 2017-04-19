@@ -10,6 +10,7 @@ public class MyRoute {
     private byte[] destination;
     private byte[] nexthop;
     private int cost;
+    private int ttl;
     private String name;
 
     public MyRoute (byte[] destination, byte[] nexthop, int cost, String name) {
@@ -72,5 +73,17 @@ public class MyRoute {
                 ", cost=" + cost +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public int getTTL() {
+        return ttl;
+    }
+
+    public boolean hasExpired() {
+        return ttl >= 0;
+    }
+
+    public void decrementTTL() {
+        ttl--;
     }
 }
