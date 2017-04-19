@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
-	private String name;
+	private String name = "";
 	private String ip = "";
 	private AddressMap map;
 	private GUI gui;
