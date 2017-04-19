@@ -131,7 +131,7 @@ public class Controller {
 								break;
 							case 2:
 								//Encryption layer part
-								EncrytionModule.EncryptionDecision choice = encrytion.handleIncomming(tcpMessage.getPayload());
+								/*EncrytionModule.EncryptionDecision choice = encrytion.handleIncomming(tcpMessage.getPayload());
 								switch (choice){
 
 									case FORWARD_TO_APLICATION:
@@ -154,6 +154,14 @@ public class Controller {
 									//end Encryption layer part
 
 								}
+								*/
+
+								byte[] payload = tcpMessage.getPayload();
+								Message message = new Message(sourceString, addressMap.getName(sourceString),
+										new String(payload));
+								view.writeMessage(message);
+								logger.write(message.getIp() + message.getName() + message.getMessage());
+
 								break;
 							case 3:
 								//file share code
@@ -167,15 +175,15 @@ public class Controller {
 	public static void sendFromApplicationLayer() {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
-			byte[] messageBytes = encrytion.encryptMessage(message.getMessage().getBytes(),message.getIp());
+			byte[] messageBytes = /*encrytion.encryptMessage(*/message.getMessage().getBytes()/*,message.getIp())*/;
 			//System.out.println(message.toString());
 			tCPLayer.createMessageData(messageBytes, message.getIp());
-		}
+		}/*
 		if (!encrytion.isBufferEmpty()){
 			Message message = encrytion.encodeFirstBufferItem();
 			byte[] messageBytes = message.getMessage().getBytes();
 			tCPLayer.createMessageData(messageBytes, message.getIp());
-		}
+		}*/
 	}
 
 	public static void sendFromTCPLayer() {
