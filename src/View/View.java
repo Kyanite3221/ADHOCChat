@@ -3,6 +3,7 @@ package View;
 import IPLayer.AddressMap;
 import IPLayer.IPLayer;
 
+import java.util.Collection;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,17 +17,7 @@ public class View implements Runnable {
 
 	public View(AddressMap map) {
 		this.map = map;
-		//new GUI().run();
-		System.out.println("Please give your name");
-		name = in.nextLine();
-		if(name.length()<8) {
-			while (name.length() < 8) {
-				name += "_";
-			}
-		}
-		else {
-			name = name.substring(0, 8);
-		}
+		new GUI(this).run();
 	}
 
 	@Override
@@ -106,6 +97,23 @@ public class View implements Runnable {
 	
 	public String getName() {
 		return name;
+	}
+	
+	protected void setName(String name) {
+		this.name = name;
+	}
+	
+	protected void addMessage(String receiver, String message) {
+		ip = (map.checkName(name)) ? IPLayer.ipByteArrayToString(map.getIpaddress(name)): "";
+		messageStack.add(new Message(ip, name, message));
+	}
+	
+	protected Collection<String> getList() {
+		return map.allnames();
+	}
+	
+	protected boolean containsName(String receiver) {
+		return map.checkName(receiver);
 	}
 
 }

@@ -4,6 +4,9 @@ package View;
 //import java.awt.Graphics;
 
 import javax.swing.*;
+
+import IPLayer.IPLayer;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +17,14 @@ public class GUIPanel extends JPanel implements ActionListener {
 	protected JTextField textField;
 	protected JTextArea textArea;
 	protected JButton button;
+	private View view;
+	private String name = "";
+	private String receiver = "";
 	
-	public GUIPanel() {
+	public GUIPanel(View view) {
 		super(new GridBagLayout());
+		
+		this.view = view;
 		
 		textField = new JTextField(20);
         textField.addActionListener(this);
@@ -59,6 +67,8 @@ public class GUIPanel extends JPanel implements ActionListener {
         c.gridy = 0;
         add(scrollPane, c);
         
+        textArea.append("Please give your name\n");
+        
 		setFocusable(true);
 	}
 	
@@ -70,9 +80,115 @@ public class GUIPanel extends JPanel implements ActionListener {
 	}*/
 	
 	public void actionPerformed(ActionEvent evt) {
-		String text = textField.getText();
-        textArea.append("Richard: " + text + "\n");
-        textField.selectAll();
-        textArea.setCaretPosition(textArea.getDocument().getLength());
+		if(name == "") {
+			name = textField.getText();
+			if(name.length()<8) {
+				while (name.length() < 8) {
+					name += " ";
+				}
+			}
+			else {
+				name = name.substring(0, 8);
+			}
+			view.setName(name);
+			textArea.append("name set, name is: " + name + "\n");
+		}
+		else {
+			String text = textField.getText();
+			textField.setText("");
+			checkInput(text);
+		}
+		textField.setText("");
     }
+	
+	private void checkInput(String line) {
+		boolean send = true;
+		boolean exit = false;
+		char first;
+		try {
+			first = line.toCharArray()[0];
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			line = " ";	//give something to write
+			first = 'a';	//set first to something other than '/'
+			send = false;
+		}
+		if(first=='/') {
+			String command = line.split(" ")[0];
+			switch(command) {
+			case "/LIST":
+				textArea.append("Here is a list:\n");
+				textArea.append(view.getList().toString() + "\n");
+				break;
+			case "/NAME":
+				boolean name_change = true;
+				try {
+					name = line.split(" ")[1];
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					textArea.append("Error: no name given after command\n");
+					name_change = false;
+				}
+				if(name_change) {
+					if(name.length()<8) {
+						while (name.length() < 8) {
+							name += " ";
+						}
+					}
+					else {
+						name = name.substring(0, 8);
+					}
+					view.setName(name);
+					textArea.append("name set, name is: " + name + "\n");
+				}
+				break;
+			case "/CONNECT":
+				boolean rec_change = true;
+				try {
+					receiver = line.split(" ")[1];
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					textArea.append("Error: no name given after command\n");
+					rec_change = false;
+					receiver = "";
+				}
+				if(rec_change) {
+					if(receiver.length()<8) {
+						while (receiver.length() < 8) {
+							receiver += " ";
+						}
+					}
+					else {
+						receiver = receiver.substring(0, 8);
+						if(!view.containsName(receiver)) {
+							textArea.append("no valid name, please give a valid name\n");
+							receiver = "";
+						}
+					}
+				}
+				break;
+			case "/EXIT":
+				textArea.append("Leaving chat\n");
+				exit = true;
+				break;
+			default:
+				textArea.append("Unknown command\n");
+				break;
+			}
+		}
+		else if(send) {
+			if(receiver != "" && view.containsName(receiver)) {
+				view.addMessage(receiver, line);
+				textArea.append(name + ": " + line + "\n");
+				textField.selectAll();
+				textArea.setCaretPosition(textArea.getDocument().getLength());
+			}
+			else {
+				textArea.append("Error: Receiver not set or receiver left the chat\n");
+			}
+		}
+		if(exit) {
+			System.exit(0);
+		}
+	}
 }
