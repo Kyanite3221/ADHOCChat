@@ -10,7 +10,7 @@ import java.util.LinkedList;
  */
 public class TCPStream {
 
-    private static final int TIMEOUT = 1000;
+    private static final int TIMEOUT = 10;
     private static final int MAX_PAYLOAD_SIZE = 229;// one less than the actual value you want
 
     public static final byte TCP_CONNECTION_INFORMATION_PORT = 0x01;
