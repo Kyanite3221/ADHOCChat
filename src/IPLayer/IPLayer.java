@@ -120,10 +120,10 @@ public class IPLayer {
 			return IPDecision.IGNORE;
 		} else if (isOwnIP(destination) || isBroadcast(destination)) {
 			return IPDecision.DELIVER;
-		//} else if (isOwnIP(nextHop)) {
-		//	return IPDecision.FORWARD;
-		} else {
+		} else if (isOwnIP(nextHop)) {
 			return IPDecision.FORWARD;
+		} else {
+			return IPDecision.IGNORE;
 		}
 	}
 
