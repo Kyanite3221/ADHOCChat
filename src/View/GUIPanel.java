@@ -1,11 +1,6 @@
 package View;
 
-//import java.awt.Color;
-//import java.awt.Graphics;
-
 import javax.swing.*;
-
-import IPLayer.IPLayer;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -71,13 +66,6 @@ public class GUIPanel extends JPanel implements ActionListener {
         
 		setFocusable(true);
 	}
-	
-	@Override
-    /*protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g.setColor(Color.CYAN);
-		g.fillRect(50, 50, 20, 20);
-	}*/
 	
 	public void actionPerformed(ActionEvent evt) {
 		if(name == "") {
@@ -190,5 +178,9 @@ public class GUIPanel extends JPanel implements ActionListener {
 		if(exit) {
 			System.exit(0);
 		}
+	}
+	
+	public void writeMessage(String name, String message) {
+		textArea.append(name + ": " + message + "\n");
 	}
 }

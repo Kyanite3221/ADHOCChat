@@ -5,85 +5,27 @@ import IPLayer.IPLayer;
 
 import java.util.Collection;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();
 	private String name;
 	private String ip = "";
-	private Scanner in = new Scanner(System.in);
 	private AddressMap map;
+	private GUI gui;
 
 	public View(AddressMap map) {
 		this.map = map;
-		new GUI(this).run();
+		gui = new GUI(this);
+		new Thread(gui).start();
 	}
 
 	@Override
 	public void run() {
-		waitForInput();
-	}
-
-	private void waitForInput() {
-		boolean exit = false;
-		while(true) {
-			if(in.hasNextLine()) {
-				boolean send = true;
-				String line = in.nextLine();
-				char first;
-				try {
-					first = line.toCharArray()[0];
-				}
-				catch (ArrayIndexOutOfBoundsException e) {
-					line = " ";	//give something to write
-					first = 'a';	//set first to something other than '/'
-					send = false;
-				}
-				if(first=='/') {
-					String command = line.split(" ")[0];
-					switch(command) {
-					case "/LIST":
-						System.out.println("Here is a list:");
-						System.out.println(map.allnames());
-						break;
-					case "/NAME":
-						System.out.println("Please give a new name");
-						name = in.nextLine();
-						break;
-					case "/CONNECT":
-						System.out.println("Give the name of the person to contact");
-						ip = in.nextLine();
-						while (! map.checkName(ip)) {
-							System.out.println("Give the name of the person to contact");
-							ip = in.nextLine();
-						}
-						ip = (map.checkName(ip)) ? IPLayer.ipByteArrayToString(map.getIpaddress(ip)): "";
-						break;
-					case "/EXIT":
-						System.out.println("Leaving chat");
-						exit = true;
-						break;
-					default:
-						System.out.println("Sorry, I do not know that command.....");
-						break;
-					}
-				}
-				else if(send) {
-					messageStack.add(new Message(ip, name, line));
-					System.out.println(name + ": " + line);
-				}
-			}
-			if(exit) {
-				System.exit(0);
-				break;
-			}
-		}
-		in.close();
 	}
 
 	public void writeMessage(Message message) {
-		System.out.println(message.getName() + ": " + message.getMessage());
+		gui.writeMessage(message.getName(), message.getMessage());
 	}
 
 	public boolean hasMessage() {
@@ -99,20 +41,20 @@ public class View implements Runnable {
 		return name;
 	}
 	
-	protected void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 	
-	protected void addMessage(String receiver, String message) {
+	public void addMessage(String receiver, String message) {
 		ip = (map.checkName(name)) ? IPLayer.ipByteArrayToString(map.getIpaddress(name)): "";
 		messageStack.add(new Message(ip, name, message));
 	}
 	
-	protected Collection<String> getList() {
+	public Collection<String> getList() {
 		return map.allnames();
 	}
 	
-	protected boolean containsName(String receiver) {
+	public boolean containsName(String receiver) {
 		return map.checkName(receiver);
 	}
 
