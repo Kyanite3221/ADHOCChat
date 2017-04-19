@@ -125,4 +125,28 @@ public class TCPMapTest {
         TCPMessage data = two.recievedMessage(msg.getFirst().toByte());
         System.out.println(Utilities.BytewiseUtilities.printBytes(data.getPayload()));
     }
+
+    public static void duplicateSequence(){
+        TCPLayer hostOne = new TCPLayer();
+        TCPLayer hostTwo = new TCPLayer();
+        initialContact(hostOne, hostTwo);
+
+        byte[] bla = new byte[4];
+        bla[0] = 0x01;
+        bla[1] = 0x0b;
+        bla[2] = 0x0a;
+        bla[3] = 0x0f;
+
+        hostOne.createMessageData(bla, "two");
+        bla[0] = 0x02;
+        hostOne.createMessageData(bla, "two");
+        bla[0] = 0x03;
+        hostOne.createMessageData(bla, "two");
+        bla[0] = 0x04;
+        hostOne.createMessageData(bla, "two");
+        bla[0] = 0x05;
+        hostOne.createMessageData(bla, "two");
+        bla[0] = 0x06;
+        hostOne.createMessageData(bla, "two");
+    }
 }

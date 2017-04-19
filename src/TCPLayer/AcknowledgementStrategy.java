@@ -48,4 +48,8 @@ public class AcknowledgementStrategy {
     public boolean moreToAck(){
         return (acks.size()>1 || (acks.size() == 1 && !acks.contains(0)));
     }
+
+    public boolean hasNotBeenRecievedBefore(int seq){
+        return (!acks.contains(seq));
+    }
 }

@@ -368,7 +368,7 @@ public class TCPStream {
         if (recievedHash != received.getDataHash()){
             System.out.println("\n!!!!WRONG HASH DATA!!!!\n");
             return null;
-        } else if (received.getPort()==2){
+        } else if (received.getPort()==2&&ackGetter.hasNotBeenRecievedBefore(received.getSequenceNumber())){
 
             ackGetter.recievedMSG(received.getSequenceNumber());
             System.out.println("Data message recieved.\n\n");
@@ -420,7 +420,7 @@ public class TCPStream {
             }
 
 
-        } else if (received.getPort()==3) {
+        } else if (received.getPort()==3 && ackGetter.hasNotBeenRecievedBefore(received.getSequenceNumber())) {
 
             ackGetter.recievedMSG(received.getSequenceNumber());
             System.out.println("Data message recieved.\n\n");
@@ -474,6 +474,9 @@ public class TCPStream {
 
         } else if (received.getPort() == 0) {
             return received;
+        } else if (received.getPort()==3 || received.getPort() == 2){
+            ackGetter.recievedMSG(received.getSequenceNumber());
+            System.out.println("duplicate Data message received.\n\n");
         }
         return null;
     }
