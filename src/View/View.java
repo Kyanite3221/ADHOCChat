@@ -19,8 +19,8 @@ public class View implements Runnable {
 		System.out.println("Please give your name");
 		name = in.nextLine();
 		if(name.length()<8) {
-			for(int i = name.length(); i < 8; i++) {
-				name.concat(" ");
+			while (name.length() < 8) {
+				name += "_";
 			}
 		}
 		else {
@@ -62,6 +62,10 @@ public class View implements Runnable {
 					case "/CONNECT":
 						System.out.println("Give the name of the person to contact");
 						ip = in.nextLine();
+						while (! map.checkName(ip)) {
+							System.out.println("Give the name of the person to contact");
+							ip = in.nextLine();
+						}
 						ip = (map.checkName(ip)) ? IPLayer.ipByteArrayToString(map.getIpaddress(ip)): "";
 						break;
 					case "/EXIT":

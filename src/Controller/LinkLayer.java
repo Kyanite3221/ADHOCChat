@@ -21,7 +21,7 @@ public class LinkLayer {
 	private BlockingQueue<byte[]> inboundQueue = new LinkedBlockingQueue<>();
 
 	private MulticastSocket socket;
-	private ScheduledExecutorService timer = Executors.newScheduledThreadPool(4);
+	private ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 
 	private final InetAddress group;
 

@@ -7,6 +7,7 @@ import TCPLayer.TCPLayer;
 import TCPLayer.TCPMessage;
 import View.Message;
 import View.View;
+import View.Logger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -39,6 +40,7 @@ public class Controller {
 	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 
 	private static AddressMap addressMap;
+	private static Logger logger;
 
 	public static void main(String[] args) {
 		PC_NUMBER = Integer.parseInt(args[0]);
@@ -46,9 +48,12 @@ public class Controller {
 		byte[] myIP = IPLayer.ipStringToByteArray(ADHOC_ADDRESS);
 		myIP[3] = (byte) PC_NUMBER;
 
+		logger = new Logger();
+
 		addressMap = new AddressMap();
 		view = new View(addressMap);
 		String name = view.getName();
+
 
 		try {
 			InetAddress inetAddress = InetAddress.getByAddress(ADHOC_GROUP);
@@ -63,6 +68,8 @@ public class Controller {
 		Thread viewThread = new Thread(view);
 		viewThread.start();
 
+		logger.write("Starting main loops");
+
 		timer.scheduleAtFixedRate(() -> {
 			receiveFromLinkLayer();
 			sendFromApplicationLayer();
@@ -72,6 +79,7 @@ public class Controller {
 		timer.scheduleAtFixedRate(() -> {
 			sendPing();
 		}, 0, 1000, TimeUnit.MILLISECONDS);
+
 	}
 
 	private static void sendPing() {
@@ -83,12 +91,13 @@ public class Controller {
 		byte[] incoming = linkLayer.receive();
 
 		if (incoming != null) {
+			logger.write("incoming packet: " + Arrays.toString(incoming) + new String(incoming));
 
 			byte[] source = ipLayer.getSource(incoming);
 			String sourceString = IPLayer.ipByteArrayToString(source);
 
 			IPLayer.IPDecision decision = ipLayer.handlePacket(incoming);
-			//	System.out.println(decision);
+			logger.write(decision.toString());
 
 			switch (decision) {
 				case IGNORE:
@@ -121,6 +130,7 @@ public class Controller {
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(tcpMessage.getPayload()));
 								view.writeMessage(message);
+								logger.write(message.getIp() + message.getName() + message.getMessage());
 								break;
 							case 3:
 								//file share code
@@ -135,7 +145,6 @@ public class Controller {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
 			byte[] messageBytes = message.getMessage().getBytes();
-			//System.out.println(message.toString());
 			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
@@ -143,9 +152,7 @@ public class Controller {
 	public static void sendFromTCPLayer() {
 		List<TCPMessage> broadcastList = tCPLayer.tick();
 		for (TCPMessage message : broadcastList) { //this exclusively sends data that was send to the "broadcast" TCPstream.
-//			System.out.println("tcpd ping:"+Arrays.toString(message.toByte()));
 			byte[] ipMessage = ipLayer.addIPHeader(message.toByte(), IPLayer.ipStringToByteArray(ADHOC_ADDRESS));
-//			System.out.println("ipMessage:" +Arrays.toString(ipMessage));
 			linkLayer.send(ipMessage);
 		}
 
