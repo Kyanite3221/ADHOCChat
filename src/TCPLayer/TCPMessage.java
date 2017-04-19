@@ -1,7 +1,5 @@
 package TCPLayer;
 
-import Utilities.BytewiseUtilities;
-
 /**
  * Created by freem on 4/7/2017.
  */

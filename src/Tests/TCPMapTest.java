@@ -1,6 +1,8 @@
 package Tests;
 
-import TCPLayer.*;
+import TCPLayer.TCPLayer;
+import TCPLayer.TCPMessage;
+
 import java.util.LinkedList;
 
 /**
@@ -119,8 +121,8 @@ public class TCPMapTest {
         bla[3] = 0x0f;
 
         one.createPingMessage(bla);
-        LinkedList<TCPMessage> msgs = one.tick();
-        TCPMessage data = two.recievedMessage(msgs.getFirst().toByte());
+        LinkedList<TCPMessage> msg = one.tick();
+        TCPMessage data = two.recievedMessage(msg.getFirst().toByte());
         System.out.println(Utilities.BytewiseUtilities.printBytes(data.getPayload()));
     }
 }

@@ -20,6 +20,7 @@ public class EncrytionModule {
     private HashMap<String, RSAPublicKeySpec> publicKeys;
     private PrivateKey privateKey;
     private HashMap <String, Long > keyMap;
+    private LinkedList<String> nameBuffer;
     private LinkedList<byte[]> buffer;
 
     private boolean canSupportEncryption;
@@ -34,6 +35,7 @@ public class EncrytionModule {
         publicKeys = new HashMap<>();
         keyMap = new HashMap<>();
         buffer = new LinkedList<> ();
+        nameBuffer = new LinkedList<>();
 
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -66,6 +68,7 @@ public class EncrytionModule {
 
         if (!keyMap.containsKey(reciever)){ //we have not yet established a secure connection with this receiver.
             buffer.add(data);
+            nameBuffer.add(reciever);
             KeyPairOwn translationStep = new KeyPairOwn(publicKeys.get("self").getModulus(), publicKeys.get("self").getPublicExponent());
             byte[] toReturn = new byte[1+translationStep.toByte().length];
             toReturn[0] = PUBLIC_KEY_EXCHANGE_FLAG; //we will send our own public key to them and add the apropriate flag.
@@ -182,8 +185,9 @@ public class EncrytionModule {
         return (buffer.size() < 1);
     }
 
-    public byte[] encodeFirstBufferItem(String receiver){
-        return encryptMessage(buffer.removeFirst(), receiver);
+    public View.Message encodeFirstBufferItem(){
+        String receiver = nameBuffer.removeFirst();
+        return new View.Message(receiver, "encryption", new String(encryptMessage(buffer.removeFirst(), receiver)));
     }
 
     public byte[] encrypt(byte[] toEncrypt, long key){

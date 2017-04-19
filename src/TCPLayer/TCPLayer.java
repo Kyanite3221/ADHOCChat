@@ -65,6 +65,17 @@ public class TCPLayer {
         for(TCPStream stream : tcpMap.values()){
             result.put(stream.getName(),stream.tick());
         }
+
+        LinkedList<String> toRemove = new LinkedList<>();
+        for(String iP : tcpMap.keySet()){
+            if (tcpMap.get(iP).isConnectionTerminated()){
+                toRemove.add(iP);
+            }
+        }
+
+        for (String removable : toRemove){
+            tcpMap.remove(removable);
+        }
         return result;
     }
 

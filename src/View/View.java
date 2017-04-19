@@ -1,10 +1,11 @@
 package View;
 
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import IPLayer.AddressMap;
 import IPLayer.IPLayer;
+
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class View implements Runnable {
 	private Queue<Message> messageStack = new LinkedBlockingQueue<>();

@@ -10,10 +10,10 @@ import java.util.LinkedList;
  */
 public class TCPStream {
 
-    private static final int TIMEOUT = 1000;
+    private static final int TIMEOUT = 10;
     private static final int MAX_PAYLOAD_SIZE = 229;// one less than the actual value you want
 
-    public static final byte CONNECTION_ESTABLISHMENT_PORT = 0x01;
+    public static final byte TCP_CONNECTION_INFORMATION_PORT = 0x01;
     public static final byte MESSAGE_DELIVERY_PORT = 0x02;
     public static final byte FILE_DELIVERY_PORT = 0x03;
     public static final byte ACK_ONLY_PORT = 0x06;
@@ -43,6 +43,7 @@ public class TCPStream {
 
     private String name;
     private boolean connectionEstablished;
+    public boolean connectionTerminated;
     private int connectionTimeOut;
 
     private LinkedList<byte[]> recievedMessageData;
@@ -68,6 +69,7 @@ public class TCPStream {
         name = "no Name";
         connectionEstablished = false;
         connectionTimeOut = TIMEOUT;
+        connectionTerminated = false;
 
 
     }
@@ -92,6 +94,7 @@ public class TCPStream {
         if (name.equals("NO SETUP")){
             connectionEstablished = true;
         }
+        connectionTerminated = false;
     }
 
     public TCPStream(String name, int sequenceWindowSize){
@@ -114,6 +117,7 @@ public class TCPStream {
         if (name.equals("NO SETUP")){
             connectionEstablished = true;
         }
+        connectionTerminated = false;
     }
 
 
@@ -233,7 +237,6 @@ public class TCPStream {
      */
     public void createPingMessage(byte[] tableInformation){ //works with any amount of messageData, but the tables shoudln't
                                                         // be too large, as it will all be fitted into a single packet
-        //TODO: add priorityMessage to queue
         priorityMessage = new TCPMessage( 0,0,0, hashData(tableInformation), (byte)0x00, ROUTING_FLAG , tableInformation);
     }
 
@@ -280,7 +283,7 @@ public class TCPStream {
             if (connectionTimeOut < 1){
                 connectionTimeOut = TIMEOUT;
                 LinkedList<TCPMessage> returnAble = new LinkedList<TCPMessage>();
-                returnAble.add(new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null));
+                returnAble.add(new TCPMessage(0,0,System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, SYN_FLAG, null));
                 return returnAble;
             } else {
                 connectionTimeOut--;
@@ -342,16 +345,22 @@ public class TCPStream {
         }
         // make sure that we ack the next message if it was a regular message to be Ack'ed
         if (received.getPort() == 1){ // if it is a connection message, we must also reply appropriately
-            if (received.getFlags()== 1){ //SYN
+            if (received.getFlags()== SYN_FLAG){ //SYN
                 connectionEstablished = true;
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,SYN_ACK_FLAG,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0, TCP_CONNECTION_INFORMATION_PORT,SYN_ACK_FLAG,null);
 
-            } else if (received.getFlags() == 3){ //SYN/ACK
+            } else if (received.getFlags() == SYN_ACK_FLAG){ //SYN/ACK
                 connectionEstablished = true;
 
-                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0,CONNECTION_ESTABLISHMENT_PORT,ACK_FLAG,null);
+                priorityMessage = new TCPMessage(0,0,System.currentTimeMillis(),0, TCP_CONNECTION_INFORMATION_PORT,ACK_FLAG,null);
 
+            } else if (received.getFlags() == FIN_FLAG){
+                priorityMessage = new TCPMessage(0, ackGetter.nextAck(), System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, FIN_ACK_FLAG, null);
+                connectionTerminated = true;
+            } else if (received.getFlags() == FIN_ACK_FLAG){
+                connectionTerminated = true;
             }
+
         } else if (received.getPort() == 6){//Ack-only message
             sequenceGetter.recieveAck(received.getAcknowledgeNumber());
         }
@@ -472,7 +481,7 @@ public class TCPStream {
     public TCPMessage establishConnection(){
         connectionEstablished = false;
         connectionTimeOut = 0;
-        return new TCPMessage(0,0,System.currentTimeMillis(), 0, CONNECTION_ESTABLISHMENT_PORT, SYN_FLAG, null);
+        return new TCPMessage(0,0,System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, SYN_FLAG, null);
     }
 
     public int hashData(byte[] data){
@@ -490,4 +499,14 @@ public class TCPStream {
     public String getName() {
         return name;
     }
+
+    public void terminateConnection(){
+        priorityMessage = new TCPMessage(sequenceGetter.getNextSeqNumber(1),ackGetter.nextAck(), System.currentTimeMillis(), 0, TCP_CONNECTION_INFORMATION_PORT, FIN_FLAG, null );
+    }
+
+    public boolean isConnectionTerminated(){
+        return connectionTerminated;
+    }
+
+
 }

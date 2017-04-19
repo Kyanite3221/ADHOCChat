@@ -1,6 +1,8 @@
 package Tests;
 
-import TCPLayer.*;
+import TCPLayer.SequenceWindow;
+import TCPLayer.TCPMessage;
+import TCPLayer.TCPStream;
 
 import java.util.LinkedList;
 

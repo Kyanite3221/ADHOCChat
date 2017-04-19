@@ -1,5 +1,6 @@
 package Controller;
 
+import EncryptionLayer.EncrytionModule;
 import IPLayer.AddressMap;
 import IPLayer.IPLayer;
 import Routing.RoutingProtocol;
@@ -36,6 +37,7 @@ public class Controller {
 	private static TCPLayer tCPLayer;
 	private static RoutingProtocol routing;
 	private static View view;
+	private static EncrytionModule encrytion;
 
 	private static ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 
@@ -61,6 +63,7 @@ public class Controller {
 			tCPLayer = new TCPLayer();
 			routing = new RoutingProtocol(name, myIP, addressMap);
 			ipLayer = new IPLayer(myIP, routing);
+			encrytion = new EncrytionModule();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -127,10 +130,30 @@ public class Controller {
 								routing.update(tcpMessage.getPayload(), source);
 								break;
 							case 2:
-								Message message = new Message(sourceString, addressMap.getName(sourceString),
-										new String(tcpMessage.getPayload()));
-								view.writeMessage(message);
-								logger.write(message.getIp() + message.getName() + message.getMessage());
+								//Encryption layer part
+								EncrytionModule.EncryptionDecision choice = encrytion.handleIncomming(tcpMessage.getPayload());
+								switch (choice){
+
+									case FORWARD_TO_APLICATION:
+										byte[] payload = encrytion.recievedMessage(tcpMessage.getPayload(), sourceString);
+										Message message = new Message(sourceString, addressMap.getName(sourceString),
+												new String(payload));
+										view.writeMessage(message);
+										logger.write(message.getIp() + message.getName() + message.getMessage());
+
+										break;
+
+									case RETURN_NEW_TO_SENDER:
+										byte[] data = encrytion.recievedMessage(tcpMessage.getPayload(), sourceString);
+										tCPLayer.createMessageData(data, sourceString);
+										break;
+
+									default:
+										break;
+
+									//end Encryption layer part
+
+								}
 								break;
 							case 3:
 								//file share code
@@ -144,6 +167,12 @@ public class Controller {
 	public static void sendFromApplicationLayer() {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
+			byte[] messageBytes = encrytion.encryptMessage(message.getMessage().getBytes(),message.getIp());
+			//System.out.println(message.toString());
+			tCPLayer.createMessageData(messageBytes, message.getIp());
+		}
+		if (!encrytion.isBufferEmpty()){
+			Message message = encrytion.encodeFirstBufferItem();
 			byte[] messageBytes = message.getMessage().getBytes();
 			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
