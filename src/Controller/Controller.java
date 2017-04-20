@@ -78,7 +78,7 @@ public class Controller {
 			tCPLayer = new TCPLayer();
 			routing = new RoutingProtocol(name, myIP, addressMap);
 			ipLayer = new IPLayer(myIP, routing);
-			encrytion = new SimpleEncryptionModule();
+			encrytion = new SimpleEncryptionModule(1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -147,7 +147,7 @@ public class Controller {
 								break;
 							case 2:
 
-								byte[] payload = /*encrytion.decrypt(*/tcpMessage.getPayload();//);
+								byte[] payload = encrytion.decrypt(tcpMessage.getPayload());
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(payload));
 								view.writeMessage(message);
@@ -166,7 +166,7 @@ public class Controller {
 	public static void sendFromApplicationLayer() {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
-			byte[] messageBytes = /*encrytion.encrypt(*/message.getMessage().getBytes();//);
+			byte[] messageBytes = encrytion.encrypt(message.getMessage().getBytes());
 			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
