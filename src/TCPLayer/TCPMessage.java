@@ -186,6 +186,11 @@ public class TCPMessage {
         return payload;
     }
 
+    public void setPayload(byte[] toSet){
+        payload = toSet;
+        payloadSize = toSet.length;
+    }
+
     public String toString() {
         return "This package has:\nSequence Number: " + sequenceNumber + "\nAcknowledgement Number: "
                 + acknowledgeNumber + "\nTimestamp: " + timeStamp + "\nData Hash: " + dataHash + "\nPort: " + port
