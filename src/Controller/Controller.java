@@ -148,6 +148,7 @@ public class Controller {
 							case 2:
 
 								byte[] payload = /*encrytion.decrypt(*/tcpMessage.getPayload();//);
+								System.out.println(Arrays.toString(payload));
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(payload));
 								view.writeMessage(message);
