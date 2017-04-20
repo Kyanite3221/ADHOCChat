@@ -122,7 +122,7 @@ public class Controller {
 				case IGNORE:
 					//this packet is not for us
 					break;
-				case FORWARD:
+					case FORWARD:
 					//this packet is not for us, but we can forward it
 					System.out.println("we are forwarding the following packet");
 					System.out.println(Arrays.toString(incoming));
@@ -147,7 +147,7 @@ public class Controller {
 								break;
 							case 2:
 
-								byte[] payload = encrytion.decrypt(tcpMessage.getPayload());
+								byte[] payload = /*encrytion.decrypt(*/tcpMessage.getPayload();//);
 								Message message = new Message(sourceString, addressMap.getName(sourceString),
 										new String(payload));
 								view.writeMessage(message);
@@ -166,7 +166,7 @@ public class Controller {
 	public static void sendFromApplicationLayer() {
 		if (view.hasMessage()) {
 			Message message = view.pollMessage();
-			byte[] messageBytes = encrytion.encrypt(message.getMessage().getBytes());
+			byte[] messageBytes = /*encrytion.encrypt(*/message.getMessage().getBytes();//);
 			tCPLayer.createMessageData(messageBytes, message.getIp());
 		}
 	}
