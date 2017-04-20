@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class TCPMapTest {
 
     public static void main(String[] args) {
-        pingTest();
+        testPriorityHierarchy();
     }
 
     private static void connectionSetup() {

@@ -2,6 +2,7 @@ package TCPLayer;
 
 import com.sun.istack.internal.NotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -426,6 +427,8 @@ public class TCPStream {
             System.out.println("Data message recieved.\n\n");
 
             if (received.getPayload()[0]==SELF_CONTAINED_DATA_MESSAGE){//the message that just came in is not part of a larger amount of data
+                byte[] newPayload = Arrays.copyOfRange(received.getPayload(), 1, received.getPayload().length);
+                received.setPayload(newPayload);
                 return received; //and can thus be forwarded to the controller
 
             } else if (received.getPayload()[0]==FIRST_AND_MORE_DATA_TO_COME) {//the message that just came in is the first of a larger ammount of data

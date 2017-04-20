@@ -11,6 +11,26 @@ public class SimpleEncryptionTest {
         decryptionWithCustomKey();
         System.out.println("\n\nrepetition code");
         keyLength();
+
+        System.out.println("\n\nstring encoding");
+        stringEncodingTest();
+
+        System.out.println("\n\nzero byte test");
+        SimpleEncryptionModule modOne = new SimpleEncryptionModule();
+        byte[] data = new byte[2];
+        data[0]= 0x00;
+        data[1] = 0x01;
+
+        byte[] encoded = modOne.encrypt(data);
+        System.out.println(Utilities.BytewiseUtilities.printBytes(encoded) + " --> " + Utilities.BytewiseUtilities.printBytes(modOne.decrypt(encoded)));
+
+    }
+
+    private static void stringEncodingTest() {
+        SimpleEncryptionModule modOne = new SimpleEncryptionModule();
+        String test = "hallo";
+        byte[] encryptedData = modOne.encrypt(test.getBytes());
+        System.out.println(new String(modOne.decrypt(encryptedData)));
     }
 
     private static void keyLength() {
